@@ -8,6 +8,7 @@ import {
     BarChart3,
     Settings,
     LogOut,
+    List,
 } from "lucide-react";
 import {
     Sidebar,
@@ -39,6 +40,11 @@ const menuItems = [
         title: "Staff",
         icon: Users,
         url: "/staff",
+    },
+    {
+        title: "Service Types",
+        icon: List,
+        url: "/service-types",
     },
     {
         title: "Services",

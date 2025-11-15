@@ -7,6 +7,7 @@ import LoginComponent from "@/components/auth/loginComponent";
 import { useNotification } from "@/context/NotificationContext";
 import { useAuth } from "@/context/AuthContext";
 import { AxiosError } from "axios";
+import { useEffect } from "react";
 
 const loginSchema = z.object({
     email: z
@@ -25,13 +26,6 @@ export default function Login() {
     const { success: notifySuccess, error: notifyError } = useNotification()
     const { login, isAuthenticated } = useAuth()
 
-    // Redirect if already authenticated
-    if (isAuthenticated) {
-        const from = (location.state as { from?: Location })?.from?.pathname || "/"
-        navigate(from, { replace: true })
-        return null
-    }
-
     const loginMutation = useMutation({
         mutationFn: authService.login,
         onSuccess: (response) => {
@@ -46,8 +40,8 @@ export default function Login() {
                     email: response.data.user.email,
                     fullName: response.data.user.fullName,
                     phone: response.data.user.phone,
-                    role: response.data.user.role as any,
-                    status: response.data.user.status as any,
+                    role: response.data.user.role ,
+                    status: response.data.user.status ,
                     createdAt: response.data.user.createdAt,
                 }
             )
@@ -90,6 +84,17 @@ export default function Login() {
         },
     });
 
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (isAuthenticated) {
+            const from = (location.state as { from?: Location })?.from?.pathname || "/"
+            navigate(from, { replace: true })
+        }
+    }, [isAuthenticated, navigate, location.state])
+
+    if (isAuthenticated) {
+        return null
+    }
 
     return (
         <LoginComponent form={form} isPending={loginMutation.isPending} />

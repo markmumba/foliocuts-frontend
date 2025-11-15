@@ -1,15 +1,13 @@
 import { createContext, useState, useEffect, useCallback, useContext, type ReactNode } from "react";
 
-export type Role = "ADMIN" | "OWNER" | "RECEPTIONIST" | "BARBER" | "SERVICE_GIRL";
-export type UserStatus = "ACTIVE" | "INACTIVE" | "PENDING" | "DELETED";
 
 export interface User {
     id: number;
     email: string;
     fullName: string;
     phone: string | null;
-    role: Role;
-    status: UserStatus;
+    role: string;
+    status: string;
     createdAt: string;
 }
 
@@ -48,8 +46,8 @@ const getStoredAuth = () => {
                 email: parsed.email,
                 fullName: parsed.fullName,
                 phone: parsed.phone,
-                role: parsed.role as Role,
-                status: parsed.status as UserStatus,
+                role: parsed.role ,
+                status: parsed.status ,
                 createdAt: parsed.createdAt,
             };
         } catch (error) {

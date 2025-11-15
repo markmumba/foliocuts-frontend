@@ -1,11 +1,11 @@
 import { Navigate, useLocation } from "react-router";
-import { useAuth, type Role } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Loader2Icon } from "lucide-react";
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
-    allowedRoles?: Role[];
+    allowedRoles?: string[];
     requireLayout?: boolean;
 }
 
