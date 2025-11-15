@@ -1,13 +1,12 @@
 export default function Dashboard() {
     return (
-        <div className="min-h-screen bg-background p-8">
-            <div className="max-w-7xl mx-auto space-y-8">
+        <div className="min-h-screen bg-background">
+            <div className="w-full space-y-8">
                 <div>
                     <h1 className="text-4xl font-bold text-primary mb-2">Dashboard</h1>
                     <p className="text-foreground-muted">Welcome to FolioCuts</p>
                 </div>
 
-                {/* Color Showcase */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div className="bg-primary text-primary-foreground p-6 rounded-lg">
                         <h3 className="font-semibold mb-2">Primary</h3>
@@ -30,7 +29,6 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Sample Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
                         <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-4">
@@ -57,7 +55,6 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Buttons Showcase */}
                 <div className="flex flex-wrap gap-4">
                     <button className="px-6 py-3 bg-secondary text-secondary-foreground font-semibold rounded-lg hover:bg-secondary-light transition-colors shadow-lg">
                         Primary Button

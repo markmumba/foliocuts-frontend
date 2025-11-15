@@ -82,20 +82,17 @@ export default function Register() {
         onSuccess: (response) => {
             console.log("Registration successful:", response)
             notifySuccess(response.message || "Registration successful! Please check your email for verification.")
-            // TODO: Navigate to next step (OTP verification)
             navigate("/login")
         },
         onError: (error: unknown) => {
             console.error("Registration failed:", error)
             let errorMessage = "An unexpected error occurred"
-
             if (error instanceof AxiosError) {
                 const apiError = error.response?.data as { message?: string } | undefined
                 errorMessage = apiError?.message || error.message || "Registration failed. Please try again."
             } else if (error instanceof Error) {
                 errorMessage = error.message
             }
-
             notifyError(errorMessage, "Registration failed")
         },
     })
@@ -113,7 +110,6 @@ export default function Register() {
             onSubmit: registerRequestSchema,
         },
         onSubmit: async ({ value }) => {
-            // Store step 1 data and move to step 2
             setStep1Data(value)
             setCurrentStep(2)
         },
@@ -131,7 +127,6 @@ export default function Register() {
             onSubmit: tenantRequestSchema,
         },
         onSubmit: async ({ value }) => {
-            // Store step 2 data and move to step 3
             setStep2Data(value)
             setCurrentStep(3)
         },

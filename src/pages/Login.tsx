@@ -2,9 +2,10 @@ import { useForm } from "@tanstack/react-form"
 import { z } from "zod"
 import { useMutation } from "@tanstack/react-query";
 import { authService } from "@/services/authService";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import LoginComponent from "@/components/auth/loginComponent";
 import { useNotification } from "@/context/NotificationContext";
+import { useAuth } from "@/context/AuthContext";
 import { AxiosError } from "axios";
 
 const loginSchema = z.object({
@@ -20,17 +21,42 @@ const loginSchema = z.object({
 
 export default function Login() {
     const navigate = useNavigate()
+    const location = useLocation()
     const { success: notifySuccess, error: notifyError } = useNotification()
+    const { login, isAuthenticated } = useAuth()
+
+    // Redirect if already authenticated
+    if (isAuthenticated) {
+        const from = (location.state as { from?: Location })?.from?.pathname || "/"
+        navigate(from, { replace: true })
+        return null
+    }
 
     const loginMutation = useMutation({
         mutationFn: authService.login,
         onSuccess: (response) => {
             console.log("Login successful:", response)
-            localStorage.setItem("accessToken", response.data.accessToken)
-            localStorage.setItem("refreshToken", response.data.refreshToken)
-            localStorage.setItem("user", JSON.stringify(response.data.user))
+
+            // Use AuthContext login function
+            login(
+                response.data.accessToken,
+                response.data.refreshToken,
+                {
+                    id: response.data.user.id,
+                    email: response.data.user.email,
+                    fullName: response.data.user.fullName,
+                    phone: response.data.user.phone,
+                    role: response.data.user.role as any,
+                    status: response.data.user.status as any,
+                    createdAt: response.data.user.createdAt,
+                }
+            )
+
             notifySuccess(response.message || "Login successful")
-            navigate("/")
+
+            // Navigate to intended destination or dashboard
+            const from = (location.state as { from?: Location })?.from?.pathname || "/"
+            navigate(from, { replace: true })
         },
         onError: (error: unknown) => {
             console.error("Login failed:", error)

@@ -34,11 +34,9 @@ export default function SubscriptionPlanComponent({
     const parseFeatures = (features: string): string[] => {
         if (!features) return [];
         try {
-            // Try to parse as JSON array
             const parsed = JSON.parse(features);
             if (Array.isArray(parsed)) return parsed;
         } catch {
-            // If not JSON, split by common delimiters
             return features.split(/[,;|]/).map(f => f.trim()).filter(Boolean);
         }
         return [];
