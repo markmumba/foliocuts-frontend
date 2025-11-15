@@ -2,12 +2,19 @@ import './App.css'
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router'
 import Dashboard from './pages/Dashboard'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import Login from './pages/Login'
-import Register from './pages/Register'
+import Login from './pages/auth/Login'
+import Register from './pages/auth/Register'
 import { NotificationProvider } from './context/NotificationContext'
 import { AuthProvider } from './context/AuthContext'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { Toaster } from './components/ui/sonner'
+import ServiceType from './pages/services/ServiceType'
+import Services from './pages/services/services'
+import CreateService from './pages/services/CreateService'
+import { Role } from './types/enums'
+import SingleService from './pages/services/SingleService'
+
+
 
 function App() {
 
@@ -47,12 +54,45 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/dashboard/service-types"
+                element={
+                  <ProtectedRoute allowedRoles={[Role.ADMIN, Role.OWNER]}>
+                    <ServiceType />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/services"
+                element={
+                  <ProtectedRoute allowedRoles={[Role.OWNER, Role.RECEPTIONIST]}>
+                    <Services />
+                  </ProtectedRoute>
+                }
+              >
+                <Route
+                  path="new"
+                  element={
+                    <ProtectedRoute allowedRoles={[Role.OWNER]} requireLayout={false}>
+                      <CreateService />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path=":serviceId"
+                  element={
+                    <ProtectedRoute allowedRoles={[Role.OWNER, Role.RECEPTIONIST, Role.ADMIN]} requireLayout={false}>
+                      <SingleService />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
 
               {/* Example: Admin-only route */}
               <Route
                 path="/admin/*"
                 element={
-                  <ProtectedRoute allowedRoles={["ADMIN"]}>
+                  <ProtectedRoute allowedRoles={[Role.ADMIN]}>
                     <div>Admin Panel</div>
                   </ProtectedRoute>
                 }
@@ -62,7 +102,7 @@ function App() {
               <Route
                 path="/settings"
                 element={
-                  <ProtectedRoute allowedRoles={["ADMIN", "OWNER"]}>
+                  <ProtectedRoute allowedRoles={[Role.ADMIN, Role.OWNER]}>
                     <div>Settings</div>
                   </ProtectedRoute>
                 }

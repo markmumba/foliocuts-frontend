@@ -44,12 +44,12 @@ const menuItems = [
     {
         title: "Service Types",
         icon: List,
-        url: "/service-types",
+        url: "/dashboard/service-types",
     },
     {
         title: "Services",
         icon: Scissors,
-        url: "/services",
+        url: "/dashboard/services",
     },
     {
         title: "Customers",
