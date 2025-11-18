@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useNavigate, useLocation } from "react-router";
 import { useAuth } from "@/context/AuthContext";
+import { formatRole } from "@/lib/utils";
 
 const menuItems = [
     {
@@ -57,9 +58,9 @@ const menuItems = [
         url: "/customers",
     },
     {
-        title: "Transactions",
+        title: "Records",
         icon: CreditCard,
-        url: "/transactions",
+        url: "/dashboard/records",
     },
     {
         title: "Reports",
@@ -76,7 +77,7 @@ const menuItems = [
 export function AppSidebar() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
 
     const handleLogout = () => {
         logout();
@@ -123,6 +124,25 @@ export function AppSidebar() {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter className="border-t border-sidebar-border">
+                {user && (
+                    <div className="px-2 py-3 mb-2">
+                        <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-sidebar-accent/50">
+                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
+                                <span className="text-primary font-semibold text-sm">
+                                    {user.fullName.charAt(0).toUpperCase()}
+                                </span>
+                            </div>
+                            <div className="flex flex-col min-w-0 flex-1">
+                                <span className="text-sm font-medium text-sidebar-foreground truncate">
+                                    {user.fullName}
+                                </span>
+                                <span className="text-xs text-sidebar-foreground/70 truncate">
+                                    {formatRole(user.role)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton

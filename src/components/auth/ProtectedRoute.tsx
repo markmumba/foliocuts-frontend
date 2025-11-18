@@ -2,6 +2,7 @@ import { Navigate, useLocation } from "react-router";
 import { useAuth } from "@/context/AuthContext";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Loader2Icon } from "lucide-react";
+import { AccessDenied } from "./AccessDenied";
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -58,16 +59,7 @@ export function ProtectedRoute({
 
     // Check role-based access
     if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-background p-8">
-                <div className="text-center max-w-md">
-                    <h2 className="text-2xl font-bold text-primary mb-2">Access Denied</h2>
-                    <p className="text-foreground-muted mb-4">
-                        You don't have permission to access this page. Required role(s): {allowedRoles.join(", ")}
-                    </p>
-                </div>
-            </div>
-        );
+        return <AccessDenied requiredRoles={allowedRoles} currentRole={user.role} />;
     }
 
     // Render children with or without layout

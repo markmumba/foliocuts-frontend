@@ -2,8 +2,8 @@ import './App.css'
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router'
 import Dashboard from './pages/Dashboard'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import Login from './pages/auth/Login'
-import Register from './pages/auth/Register'
+import Login from './pages/auth/login'
+import Register from './pages/auth/register'
 import { NotificationProvider } from './context/NotificationContext'
 import { AuthProvider } from './context/AuthContext'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
@@ -13,9 +13,10 @@ import CreateService from './pages/services/create-service'
 import { Role } from './types/enums'
 import SingleService from './pages/services/single-service'
 import ServiceTypeServices from './pages/services/service-type-services'
-import Services from './pages/services/Services'
+import Services from './pages/services/services'
 import Staff from './pages/staff/staff'
 import CreateStaff from './pages/staff/create-staff'
+import Records from './pages/records/records'
 
 
 
@@ -60,7 +61,7 @@ function App() {
               <Route
                 path="/dashboard/staff"
                 element={
-                  <ProtectedRoute allowedRoles={[Role.ADMIN, Role.OWNER]}>
+                  <ProtectedRoute allowedRoles={[ Role.OWNER]}>
                     <Staff />
                   </ProtectedRoute>
                 }
@@ -116,7 +117,14 @@ function App() {
                   }
                 />
               </Route>
-
+              <Route
+                path="/dashboard/records"
+                element={
+                  <ProtectedRoute allowedRoles={[ Role.OWNER]}>
+                    <Records />
+                  </ProtectedRoute>
+                }
+              />
               {/* Example: Admin-only route */}
               <Route
                 path="/admin/*"
