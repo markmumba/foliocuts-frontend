@@ -27,4 +27,8 @@ export const servicesService = {
         const response = await apiClient.get<ApiResponse<ServiceResponse>>(`/services/${serviceId}`);
         return response.data;
     },
+    getServicesByServiceTypeId: async (serviceTypeId: string): Promise<ApiResponse<ServiceResponse[]>> => {
+        const response = await apiClient.get<ApiResponse<ServiceResponse[]>>(`/services/service-type-services/${serviceTypeId}`);
+        return response.data;
+    },
 }

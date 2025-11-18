@@ -3,6 +3,7 @@ import { useService } from "@/hooks/useService";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ArrowLeft, Edit, DollarSign, Percent, Calendar, Tag, Info } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function SingleService() {
     const { serviceId } = useParams();
@@ -10,14 +11,7 @@ export default function SingleService() {
     const { data: service, isLoading, error } = useService(serviceId!);
 
     if (isLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-[400px]">
-                <div className="text-center">
-                    <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-muted-foreground">Loading service details...</p>
-                </div>
-            </div>
-        );
+        return <Spinner />;
     }
 
     if (error) {
@@ -132,7 +126,7 @@ export default function SingleService() {
 
             {/* Loyalty Rule Card */}
             {serviceData.loyaltyRule && (
-                <div className="border border-border rounded-lg p-6 bg-gradient-to-br from-accent/5 to-accent/10 shadow-sm">
+                <div className="border border-border rounded-lg p-6 bg-linear-to-br from-accent/5 to-accent/10 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
                         <Info className="w-5 h-5 text-accent" />
                         <h2 className="text-xl font-semibold text-card-foreground">

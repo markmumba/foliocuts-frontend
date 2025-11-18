@@ -8,11 +8,14 @@ import { NotificationProvider } from './context/NotificationContext'
 import { AuthProvider } from './context/AuthContext'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { Toaster } from './components/ui/sonner'
-import ServiceType from './pages/services/ServiceType'
-import Services from './pages/services/services'
-import CreateService from './pages/services/CreateService'
+import ServiceType from './pages/services/service-type'
+import CreateService from './pages/services/create-service'
 import { Role } from './types/enums'
-import SingleService from './pages/services/SingleService'
+import SingleService from './pages/services/single-service'
+import ServiceTypeServices from './pages/services/service-type-services'
+import Services from './pages/services/Services'
+import Staff from './pages/staff/staff'
+import CreateStaff from './pages/staff/create-staff'
 
 
 
@@ -55,13 +58,39 @@ function App() {
                 }
               />
               <Route
+                path="/dashboard/staff"
+                element={
+                  <ProtectedRoute allowedRoles={[Role.ADMIN, Role.OWNER]}>
+                    <Staff />
+                  </ProtectedRoute>
+                }
+             >
+              <Route
+                path="create"
+                element={
+                  <ProtectedRoute allowedRoles={[Role.ADMIN, Role.OWNER]} requireLayout={false}>
+                    <CreateStaff />
+                  </ProtectedRoute>
+                }
+              />
+              </Route> 
+              <Route
                 path="/dashboard/service-types"
                 element={
                   <ProtectedRoute allowedRoles={[Role.ADMIN, Role.OWNER]}>
                     <ServiceType />
                   </ProtectedRoute>
                 }
-              />
+              >
+                <Route
+                  path=":serviceTypeId/services"
+                  element={
+                    <ProtectedRoute allowedRoles={[Role.OWNER, Role.RECEPTIONIST, Role.ADMIN]} requireLayout={false}>
+                      <ServiceTypeServices />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
               <Route
                 path="/dashboard/services"
                 element={

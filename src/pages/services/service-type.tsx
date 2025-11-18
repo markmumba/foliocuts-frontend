@@ -1,4 +1,5 @@
-import {  useServiceTypes } from "@/hooks/useService";
+import { useState } from "react";
+import { useServiceTypes } from "@/hooks/useService";
 import { useAuth } from "@/context/AuthContext";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
@@ -16,6 +17,9 @@ import { Input } from "@/components/ui/input";
 import { useNotification } from "@/context/NotificationContext";
 import type { ServiceTypeRequest } from "@/types/serviceType";
 import { AxiosError } from "axios";
+import { Outlet, useLocation, useNavigate } from "react-router";
+import { Spinner } from "@/components/ui/spinner";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 const serviceTypeSchema = z.object({
     name: z
@@ -28,10 +32,13 @@ const serviceTypeSchema = z.object({
 });
 
 export default function ServiceType() {
+    const navigate = useNavigate();
     const { data: serviceTypes, isLoading, error } = useServiceTypes();
     const { user } = useAuth();
     const { success: notifySuccess, error: notifyError } = useNotification();
     const queryClient = useQueryClient();
+    const [showCreateForm, setShowCreateForm] = useState(false);
+    const isServiceTypeServicesPage = useLocation().pathname.includes('/services');
 
     const isAdmin = user?.role === "ADMIN";
 
@@ -41,6 +48,7 @@ export default function ServiceType() {
             notifySuccess("Service type created successfully");
             queryClient.invalidateQueries({ queryKey: ['service-types'] });
             form.reset();
+            setShowCreateForm(false);
         },
         onError: (error: unknown) => {
             console.error("Create service type failed:", error);
@@ -76,69 +84,74 @@ export default function ServiceType() {
     });
 
     if (isLoading) {
-        return (
-            <div className="p-6">
-                <div className="text-center py-12">
-                    <p className="text-muted-foreground">Loading service types...</p>
-                </div>
-            </div>
-        );
+        return <Spinner />;
     }
 
     if (error) {
-        return (
-            <div className="p-6">
-                <div className="text-center py-12">
-                    <p className="text-destructive">Error: {error.message}</p>
-                </div>
-            </div>
-        );
+        return <Alert variant="destructive">
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error.message}</AlertDescription>
+        </Alert>;
     }
+
 
     return (
         <div className="p-6 space-y-8">
-            <div>
-                <h1 className="text-3xl font-bold mb-2">Service Types</h1>
-                <p className="text-muted-foreground">
-                    Manage service types available in your barbershop
-                </p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold mb-2">Service Types</h1>
+                    <p className="text-muted-foreground">
+                        Manage service types available in your barbershop
+                    </p>
+                </div>
+                {isAdmin && (
+                    <Button
+                        variant="default"
+                        size="lg"
+                        onClick={() => setShowCreateForm(!showCreateForm)}
+                    >
+                        {showCreateForm ? "Cancel" : "Create New Service Type"}
+                    </Button>
+                )}
             </div>
+            <Outlet />
+            {!isServiceTypeServicesPage && (
+                serviceTypes?.data && serviceTypes.data.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {serviceTypes.data.map((serviceType) => (
+                            <div
+                                key={serviceType.id}
+                                onClick={() => navigate(`/dashboard/service-types/${serviceType.id}/services`)}
+                                className="border border-border rounded-lg p-6 bg-card hover:shadow-md transition-shadow"
+                            >
+                                <div className="flex items-start justify-between mb-3">
+                                    <h3 className="text-xl font-semibold text-card-foreground">
+                                        {serviceType.name}
+                                    </h3>
+                                    <span className="px-2 py-1 text-xs font-medium rounded-md bg-secondary text-secondary-foreground">
+                                        {serviceType.staffRole}
+                                    </span>
+                                </div>
+                                {serviceType.description && (
+                                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                                        {serviceType.description}
+                                    </p>
+                                )}
+                                <div className="text-xs text-muted-foreground">
+                                    Created: {new Date(serviceType.createdAt).toLocaleDateString()}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="border border-border rounded-lg p-12 text-center bg-card">
+                        <p className="text-muted-foreground">No service types found</p>
+                    </div>
+                ))}
 
-            {/* Service Types Grid */}
-            {serviceTypes?.data && serviceTypes.data.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {serviceTypes.data.map((serviceType) => (
-                        <div
-                            key={serviceType.id}
-                            className="border border-border rounded-lg p-6 bg-card hover:shadow-md transition-shadow"
-                        >
-                            <div className="flex items-start justify-between mb-3">
-                                <h3 className="text-xl font-semibold text-card-foreground">
-                                    {serviceType.name}
-                                </h3>
-                                <span className="px-2 py-1 text-xs font-medium rounded-md bg-secondary text-secondary-foreground">
-                                    {serviceType.staffRole}
-                                </span>
-                            </div>
-                            {serviceType.description && (
-                                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                                    {serviceType.description}
-                                </p>
-                            )}
-                            <div className="text-xs text-muted-foreground">
-                                Created: {new Date(serviceType.createdAt).toLocaleDateString()}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                <div className="border border-border rounded-lg p-12 text-center bg-card">
-                    <p className="text-muted-foreground">No service types found</p>
-                </div>
-            )}
 
             {/* Create Service Type Form - Admin Only */}
-            {isAdmin && (
+            {isAdmin && showCreateForm && (
                 <div className="border-t border-border pt-8">
                     <div className="max-w-2xl">
                         <h2 className="text-2xl font-bold mb-2">Create New Service Type</h2>
@@ -240,7 +253,18 @@ export default function ServiceType() {
                                     />
                                 </FieldGroup>
 
-                                <div className="flex justify-end">
+                                <div className="flex justify-end gap-4">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="lg"
+                                        onClick={() => {
+                                            setShowCreateForm(false);
+                                            form.reset();
+                                        }}
+                                    >
+                                        Cancel
+                                    </Button>
                                     <Button
                                         type="submit"
                                         form="create-service-type-form"

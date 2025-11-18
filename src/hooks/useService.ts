@@ -22,3 +22,10 @@ export function useService(serviceId: string) {
         enabled: !!serviceId,
     })
 }
+export function useServicesByServiceTypeId(serviceTypeId: string) {
+    return useQuery({
+        queryKey: ['services-by-service-type-id', serviceTypeId],
+        queryFn: () => servicesService.getServicesByServiceTypeId(serviceTypeId),
+        enabled: !!serviceTypeId,
+    })
+}

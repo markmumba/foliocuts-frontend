@@ -39,7 +39,7 @@ const menuItems = [
     {
         title: "Staff",
         icon: Users,
-        url: "/staff",
+        url: "/dashboard/staff",
     },
     {
         title: "Service Types",

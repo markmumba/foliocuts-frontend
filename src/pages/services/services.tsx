@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { useServices } from "@/hooks/useService";
 import { useNavigate, Outlet, useLocation, useParams } from "react-router";
+import { Spinner } from "@/components/ui/spinner";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 export default function Services() {
     const { data: services, isLoading, error } = useServices();
@@ -11,11 +13,14 @@ export default function Services() {
     const isSingleServicePage = !!params.serviceId;
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return <Spinner />;
     }
 
     if (error) {
-        return <div>Error: {error.message}</div>;
+        return <Alert variant="destructive">
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error.message}</AlertDescription>
+        </Alert>;
     }
 
     return (
