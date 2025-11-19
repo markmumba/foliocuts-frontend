@@ -17,6 +17,7 @@ import Services from './pages/services/services'
 import Staff from './pages/staff/staff'
 import CreateStaff from './pages/staff/create-staff'
 import Records from './pages/records/records'
+import CreateRecord from './pages/records/create-record'
 
 
 
@@ -124,7 +125,16 @@ function App() {
                     <Records />
                   </ProtectedRoute>
                 }
-              />
+              >
+                <Route
+                  path="create"
+                  element={
+                    <ProtectedRoute allowedRoles={[Role.OWNER]} requireLayout={false}>
+                      <CreateRecord />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
               {/* Example: Admin-only route */}
               <Route
                 path="/admin/*"
