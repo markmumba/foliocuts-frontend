@@ -5,7 +5,7 @@ export interface RegisterRequest {
     phone: string;
     address?: string;
     tenant: TenantRequest;
-    subscriptionPlanId?: number;
+    subscriptionPlanId?: string;
 }
 
 export interface TenantRequest {

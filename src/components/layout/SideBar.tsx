@@ -1,6 +1,5 @@
 import {
     LayoutDashboard,
-    Calendar,
     Users,
     Scissors,
     UserCircle,
@@ -24,18 +23,13 @@ import {
 } from "@/components/ui/sidebar";
 import { useNavigate, useLocation } from "react-router";
 import { useAuth } from "@/context/AuthContext";
-import { formatRole } from "@/lib/utils";
+import { formatRole } from "@/utils/utilities";
 
 const menuItems = [
     {
         title: "Dashboard",
         icon: LayoutDashboard,
         url: "/",
-    },
-    {
-        title: "Appointments",
-        icon: Calendar,
-        url: "/appointments",
     },
     {
         title: "Staff",
@@ -61,6 +55,11 @@ const menuItems = [
         title: "Records",
         icon: CreditCard,
         url: "/dashboard/records",
+    },
+    {
+        title: "Subscription Templates",
+        icon: CreditCard,
+        url: "/dashboard/subscription-templates",
     },
     {
         title: "Reports",

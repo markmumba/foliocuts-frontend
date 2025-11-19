@@ -75,7 +75,7 @@ export default function Register() {
         mpesaTillNo: string;
         mpesaBusinessShortCode: string;
     } | null>(null)
-    const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null)
+    const [selectedPlanId, setSelectedPlanId] = useState<string| null>(null)
 
     const registerMutation = useMutation({
         mutationFn: authService.register,
@@ -140,7 +140,7 @@ export default function Register() {
         setCurrentStep(2)
     }
 
-    const handlePlanSelect = (planId: number) => {
+    const handlePlanSelect = (planId: string) => {
         setSelectedPlanId(planId)
     }
 

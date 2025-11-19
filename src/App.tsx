@@ -18,6 +18,9 @@ import Staff from './pages/staff/staff'
 import CreateStaff from './pages/staff/create-staff'
 import Records from './pages/records/records'
 import CreateRecord from './pages/records/create-record'
+import SubscriptionPlanTemplate from './pages/subscription/subscription-template'
+import CreateSubscriptionPlanTemplate from './pages/subscription/create-subscription'
+import EditSubscriptionTemplate from './pages/subscription/edit-subscription-template'
 
 
 
@@ -62,20 +65,20 @@ function App() {
               <Route
                 path="/dashboard/staff"
                 element={
-                  <ProtectedRoute allowedRoles={[ Role.OWNER]}>
+                  <ProtectedRoute allowedRoles={[Role.OWNER]}>
                     <Staff />
                   </ProtectedRoute>
                 }
-             >
-              <Route
-                path="create"
-                element={
-                  <ProtectedRoute allowedRoles={[Role.ADMIN, Role.OWNER]} requireLayout={false}>
-                    <CreateStaff />
-                  </ProtectedRoute>
-                }
-              />
-              </Route> 
+              >
+                <Route
+                  path="create"
+                  element={
+                    <ProtectedRoute allowedRoles={[Role.ADMIN, Role.OWNER]} requireLayout={false}>
+                      <CreateStaff />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
               <Route
                 path="/dashboard/service-types"
                 element={
@@ -121,7 +124,7 @@ function App() {
               <Route
                 path="/dashboard/records"
                 element={
-                  <ProtectedRoute allowedRoles={[ Role.OWNER]}>
+                  <ProtectedRoute allowedRoles={[Role.OWNER]}>
                     <Records />
                   </ProtectedRoute>
                 }
@@ -131,6 +134,31 @@ function App() {
                   element={
                     <ProtectedRoute allowedRoles={[Role.OWNER]} requireLayout={false}>
                       <CreateRecord />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
+              <Route
+                path="/dashboard/subscription-templates"
+                element={
+                  <ProtectedRoute allowedRoles={[Role.ADMIN, Role.OWNER]}>
+                    <SubscriptionPlanTemplate />
+                  </ProtectedRoute>
+                }
+              >
+                <Route
+                  path="new"
+                  element={
+                    <ProtectedRoute allowedRoles={[Role.ADMIN]} requireLayout={false}>
+                      <CreateSubscriptionPlanTemplate />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path=":templateId/edit"
+                  element={
+                    <ProtectedRoute allowedRoles={[Role.ADMIN]} requireLayout={false}>
+                      <EditSubscriptionTemplate />
                     </ProtectedRoute>
                   }
                 />

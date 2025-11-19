@@ -19,7 +19,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { Role } from "@/types/enums";
 import type { CreateStaffRequest, CreateEmployeesResponse } from "@/types/user";
-import { formatRole } from "@/lib/utils";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -30,6 +29,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { formatRole } from "@/utils/utilities";
 
 export default function CreateStaff() {
     const navigate = useNavigate();

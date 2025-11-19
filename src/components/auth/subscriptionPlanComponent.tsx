@@ -4,8 +4,8 @@ import type { SubscriptionPlanTemplateResponse } from "@/types/subscriptionPlanT
 import { Loader2Icon, CheckIcon } from "lucide-react";
 
 interface SubscriptionPlanComponentProps {
-    selectedPlanId: number | null;
-    onPlanSelect: (planId: number) => void;
+    selectedPlanId: string | null;
+    onPlanSelect: (planId: string) => void;
     onBack?: () => void;
     onComplete?: () => void;
     isPending?: boolean;
