@@ -2,7 +2,7 @@ import './App.css'
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router'
 import Dashboard from './pages/Dashboard'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import Register from './pages/auth/register'
+import Register from './pages/auth/Register'
 import { NotificationProvider } from './context/NotificationContext'
 import { AuthProvider } from './context/AuthContext'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
@@ -23,8 +23,8 @@ import EditSubscriptionTemplate from './pages/subscription/edit-subscription-tem
 import Tenant from './pages/tenant/tenant'
 import Settings from './pages/common/settings'
 import SingleTenant from './pages/tenant/singletenant'
+import MyShop from './pages/tenant/myShop'
 import Login from './pages/auth/Login'
-import MyShop from './pages/tenant/myshop'
 
 
 
@@ -69,7 +69,7 @@ function App() {
               <Route
                 path="/dashboard/my-shop"
                 element={
-                  <ProtectedRoute allowedRoles={[ Role.OWNER]}>
+                  <ProtectedRoute allowedRoles={[Role.OWNER]}>
                     <MyShop />
                   </ProtectedRoute>
                 }
@@ -77,20 +77,20 @@ function App() {
               <Route
                 path="/dashboard/tenants"
                 element={
-                  <ProtectedRoute allowedRoles={[ Role.ADMIN]}>
+                  <ProtectedRoute allowedRoles={[Role.ADMIN]}>
                     <Tenant />
                   </ProtectedRoute>
                 }
-                >
-                  <Route
-                    path=":tenantId"
-                    element={
-                      <ProtectedRoute allowedRoles={[Role.ADMIN, Role.OWNER, Role.RECEPTIONIST]}>
-                        <SingleTenant />
-                      </ProtectedRoute>
-                    }
-                  />
-                </Route>
+              >
+                <Route
+                  path=":tenantId"
+                  element={
+                    <ProtectedRoute allowedRoles={[Role.ADMIN, Role.OWNER, Role.RECEPTIONIST]}>
+                      <SingleTenant />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
 
               <Route
                 path="/dashboard/staff"
