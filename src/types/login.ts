@@ -13,10 +13,11 @@ export interface LoginResponse {
 export interface UserResponse {
     id: number;
     email: string;
-    fullName: string;
-    phone: string;
+    fullName: string | null;
+    phone: string | null;
     status: string;
-    role: string;
+    role: string | null;
+    tenantId: string | null;
     createdAt: string;
     updatedAt: string;
 }

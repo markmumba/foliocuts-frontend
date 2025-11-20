@@ -102,6 +102,7 @@ export function AppSidebar() {
     const navigate = useNavigate();
     const location = useLocation();
     const { logout, user } = useAuth();
+    console.log(user);
 
     const handleLogout = () => {
         logout();
@@ -158,12 +159,12 @@ export function AppSidebar() {
                         <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-sidebar-accent/50">
                             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
                                 <span className="text-primary font-semibold text-sm">
-                                    {user.fullName.charAt(0).toUpperCase()}
+                                    {user.fullName?.charAt(0).toUpperCase() ?? user.email?.charAt(0).toUpperCase() ?? "U"}
                                 </span>
                             </div>
                             <div className="flex flex-col min-w-0 flex-1">
                                 <span className="text-sm font-medium text-sidebar-foreground truncate">
-                                    {user.fullName}
+                                    {user.fullName ?? "User"}
                                 </span>
                                 <span className="text-xs text-sidebar-foreground/70 truncate">
                                     {formatRole(user.role)}

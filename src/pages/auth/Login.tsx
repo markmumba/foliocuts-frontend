@@ -8,6 +8,7 @@ import { useNotification } from "@/context/NotificationContext";
 import { useAuth } from "@/context/AuthContext";
 import { AxiosError } from "axios";
 import { useEffect } from "react";
+import { decodeJWT } from "@/utils/utilities";
 
 const loginSchema = z.object({
     email: z
@@ -31,7 +32,11 @@ export default function Login() {
         onSuccess: (response) => {
             console.log("Login successful:", response)
 
-            // Use AuthContext login function
+            const jwtPayload = decodeJWT(response.data.accessToken);
+            const userRole = response.data.user.role || (jwtPayload?.role as string) || null;
+            const userTenantId = response.data.user.tenantId || (jwtPayload?.tenantId ? String(jwtPayload.tenantId) : null);
+            console.log("Login return values",response.data);
+
             login(
                 response.data.accessToken,
                 response.data.refreshToken,
@@ -39,9 +44,10 @@ export default function Login() {
                     id: response.data.user.id,
                     email: response.data.user.email,
                     fullName: response.data.user.fullName,
+                    tenantId: userTenantId,
                     phone: response.data.user.phone,
-                    role: response.data.user.role ,
-                    status: response.data.user.status ,
+                    role: userRole,
+                    status: response.data.user.status,
                     createdAt: response.data.user.createdAt,
                 }
             )

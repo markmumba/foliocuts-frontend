@@ -58,7 +58,7 @@ export function ProtectedRoute({
     }
 
     // Check role-based access
-    if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+    if (allowedRoles && user && user.role && !allowedRoles.includes(user.role)) {
         return <AccessDenied requiredRoles={allowedRoles} currentRole={user.role} />;
     }
 

@@ -4,8 +4,9 @@
  * @param role - The role string (e.g., "SERVICE_GIRL")
  * @returns Formatted role string (e.g., "SERVICE GIRL")
  */
-export function formatRole(role: string): string {
-    return role.replace(/_/g, " ")
+export function formatRole(role: string | null | undefined): string {
+    if (!role) return "User";
+    return role.replace(/_/g, " ");
 }
 
 
@@ -27,3 +28,28 @@ export const formatPrice = (price: number) =>
         currency: "KES",
         minimumFractionDigits: 0,
     }).format(price);
+
+/**
+ * Decodes a JWT token and returns the payload
+ * @param token - The JWT token string
+ * @returns The decoded payload or null if invalid
+ */
+export function decodeJWT(token: string): Record<string, unknown> | null {
+    try {
+        const base64Url = token.split('.')[1];
+        if (!base64Url) return null;
+
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            atob(base64)
+                .split('')
+                .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+        );
+
+        return JSON.parse(jsonPayload);
+    } catch (error) {
+        console.error('Failed to decode JWT:', error);
+        return null;
+    }
+}

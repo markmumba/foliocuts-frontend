@@ -4,10 +4,11 @@ import { createContext, useState, useEffect, useCallback, useContext, type React
 export interface User {
     id: number;
     email: string;
-    fullName: string;
+    fullName: string | null;
     phone: string | null;
-    role: string;
+    role: string | null;
     status: string;
+    tenantId?: string | null;
     createdAt: string;
 }
 
@@ -41,15 +42,18 @@ const getStoredAuth = () => {
     if (userStr) {
         try {
             const parsed = JSON.parse(userStr);
+            console.log('Parsed user from localStorage:', parsed);
             user = {
                 id: parsed.id,
                 email: parsed.email,
                 fullName: parsed.fullName,
                 phone: parsed.phone,
-                role: parsed.role ,
-                status: parsed.status ,
+                role: parsed.role,
+                status: parsed.status,
+                tenantId: parsed.tenantId,
                 createdAt: parsed.createdAt,
             };
+            console.log('User object after mapping:', user);
         } catch (error) {
             console.error('Failed to parse stored user:', error);
             clearStoredAuth();
@@ -78,9 +82,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, []);
 
     const login = useCallback((newAccessToken: string, newRefreshToken: string, newUser: User) => {
+        console.log('Login called with user:', newUser);
         localStorage.setItem('accessToken', newAccessToken);
         localStorage.setItem('refreshToken', newRefreshToken);
-        localStorage.setItem('user', JSON.stringify(newUser));
+        const userJson = JSON.stringify(newUser);
+        console.log('Storing user to localStorage:', userJson);
+        localStorage.setItem('user', userJson);
 
         setAccessToken(newAccessToken);
         setRefreshToken(newRefreshToken);
