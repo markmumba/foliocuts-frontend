@@ -42,7 +42,6 @@ const getStoredAuth = () => {
     if (userStr) {
         try {
             const parsed = JSON.parse(userStr);
-            console.log('Parsed user from localStorage:', parsed);
             user = {
                 id: parsed.id,
                 email: parsed.email,
@@ -53,7 +52,6 @@ const getStoredAuth = () => {
                 tenantId: parsed.tenantId,
                 createdAt: parsed.createdAt,
             };
-            console.log('User object after mapping:', user);
         } catch (error) {
             console.error('Failed to parse stored user:', error);
             clearStoredAuth();

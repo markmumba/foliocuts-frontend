@@ -9,6 +9,7 @@ import {
     LogOut,
     List,
     Building2,
+    Store,
 } from "lucide-react";
 import {
     Sidebar,
@@ -41,6 +42,12 @@ const menuItems: MenuItem[] = [
         icon: LayoutDashboard,
         url: "/",
         roles: [Role.OWNER, Role.ADMIN, Role.RECEPTIONIST, Role.BARBER, Role.SERVICE_GIRL],
+    },
+    {
+        title: "My Shop",
+        icon: Store,
+        url: "/dashboard/my-shop",
+        roles: [Role.OWNER],
     },
     {
         title: "Tenants",
@@ -102,7 +109,6 @@ export function AppSidebar() {
     const navigate = useNavigate();
     const location = useLocation();
     const { logout, user } = useAuth();
-    console.log(user);
 
     const handleLogout = () => {
         logout();
