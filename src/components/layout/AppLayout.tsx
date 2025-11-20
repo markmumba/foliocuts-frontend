@@ -7,9 +7,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     return (
         <SidebarProvider>
             <AppSidebar />
-            <SidebarInset className="p-4">
+            <SidebarInset className="!m-0 !p-0 md:!m-0 md:!ml-0 md:!p-0">
                 {/* <AppHeader /> */}
-                <main className="w-full ">
+                <main className="w-full">
                     {children}
                 </main>
             </SidebarInset>

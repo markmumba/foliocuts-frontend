@@ -3,7 +3,7 @@ import { Outlet, useLocation, useNavigate } from "react-router";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { useSubscriptionTemaplatePlans } from "@/hooks/useSubscriptionTemaplatePlans";
+import {  useSubscriptionTemaplatePlansAdmin } from "@/hooks/useSubscriptionTemaplatePlans";
 import type { SubscriptionPlanTemplateResponse } from "@/types/subscriptionPlanTemplate";
 import { CheckIcon, Pencil, Trash2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
@@ -13,7 +13,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { subscriptionService } from "@/services/subscriptionService";
 
 export default function SubscriptionPlanTemplate() {
-    const { data, isLoading, error } = useSubscriptionTemaplatePlans();
+    const { data, isLoading, error } = useSubscriptionTemaplatePlansAdmin();
     const navigate = useNavigate();
     const location = useLocation();
     const isCreatePage = location.pathname.includes('/new');

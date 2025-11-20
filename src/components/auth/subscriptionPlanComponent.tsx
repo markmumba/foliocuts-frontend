@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useSubscriptionTemaplatePlans } from "@/hooks/useSubscriptionTemaplatePlans";
+import { useSubscriptionTemaplatePlansCustomer } from "@/hooks/useSubscriptionTemaplatePlans";
 import type { SubscriptionPlanTemplateResponse } from "@/types/subscriptionPlanTemplate";
 import { Loader2Icon, CheckIcon } from "lucide-react";
 
@@ -18,7 +18,7 @@ export default function SubscriptionPlanComponent({
     onComplete,
     isPending = false
 }: SubscriptionPlanComponentProps) {
-    const { data, isLoading, error } = useSubscriptionTemaplatePlans();
+    const { data, isLoading, error } = useSubscriptionTemaplatePlansCustomer();
 
     const plans = data?.data || [];
 

@@ -2,13 +2,19 @@ import { subscriptionService } from "@/services/subscriptionService";
 import { useQuery } from "@tanstack/react-query";
 
 
-export function useSubscriptionTemaplatePlans() {
+export function useSubscriptionTemaplatePlansAdmin() {
     return useQuery({
         queryKey: ['subscription-plan-templates'],
-        queryFn: subscriptionService.getSubscriptionPlanTemplates,
+        queryFn: subscriptionService.getSubscriptionPlanTemplatesAdmin,
     })
 }
 
+export function useSubscriptionTemaplatePlansCustomer() {
+    return useQuery({
+        queryKey: ['subscription-plan-templates-customer'],
+        queryFn: subscriptionService.getSubscriptionPlanTemplatesCustomer,
+    })
+}
 export function useSubscriptionPlanTemplate(id?: string) {
     return useQuery({
         queryKey: ['subscription-plan-template', id],

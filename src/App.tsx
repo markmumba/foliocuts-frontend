@@ -21,6 +21,9 @@ import CreateRecord from './pages/records/create-record'
 import SubscriptionPlanTemplate from './pages/subscription/subscription-template'
 import CreateSubscriptionPlanTemplate from './pages/subscription/create-subscription'
 import EditSubscriptionTemplate from './pages/subscription/edit-subscription-template'
+import Tenant from './pages/tenant/tenant'
+import Settings from './pages/common/settings'
+import SingleTenant from './pages/tenant/singletenant'
 
 
 
@@ -62,6 +65,24 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/dashboard/tenants"
+                element={
+                  <ProtectedRoute allowedRoles={[ Role.ADMIN]}>
+                    <Tenant />
+                  </ProtectedRoute>
+                }
+                >
+                  <Route
+                    path=":tenantId"
+                    element={
+                      <ProtectedRoute allowedRoles={[Role.ADMIN, Role.OWNER, Role.RECEPTIONIST]}>
+                        <SingleTenant />
+                      </ProtectedRoute>
+                    }
+                  />
+                </Route>
+
               <Route
                 path="/dashboard/staff"
                 element={
@@ -163,27 +184,14 @@ function App() {
                   }
                 />
               </Route>
-              {/* Example: Admin-only route */}
               <Route
-                path="/admin/*"
-                element={
-                  <ProtectedRoute allowedRoles={[Role.ADMIN]}>
-                    <div>Admin Panel</div>
-                  </ProtectedRoute>
-                }
-              />
-
-              {/* Example: Owner/Admin routes */}
-              <Route
-                path="/settings"
+                path="/dashboard/settings"
                 element={
                   <ProtectedRoute allowedRoles={[Role.ADMIN, Role.OWNER]}>
-                    <div>Settings</div>
+                    <Settings />
                   </ProtectedRoute>
                 }
               />
-
-              {/* Catch all - redirect to home */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>

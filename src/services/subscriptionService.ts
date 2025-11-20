@@ -4,18 +4,16 @@ import { apiClient } from "./api";
 
 export const subscriptionService = {
 
-    getSubscriptionPlanTemplates: async (): Promise<ApiResponse<SubscriptionPlanTemplateResponse[]>> => {
+    getSubscriptionPlanTemplatesAdmin: async (): Promise<ApiResponse<SubscriptionPlanTemplateResponse[]>> => {
         const response = await apiClient.get<ApiResponse<SubscriptionPlanTemplateResponse[]>>('/subscription/subscription-plan-template');
-        console.log("response", response.data);
+        return response.data;
+    },
+    getSubscriptionPlanTemplatesCustomer: async (): Promise<ApiResponse<SubscriptionPlanTemplateResponse[]>> => {
+        const response = await apiClient.get<ApiResponse<SubscriptionPlanTemplateResponse[]>>('/subscription/subscription-plan-template-for-customer');
         return response.data;
     },
     getSubscriptionPlanTemplate: async (id: string): Promise<ApiResponse<SubscriptionPlanTemplateResponse>> => {
-        console.log("id", id);
-        console.log("endpoint url", apiClient.getUri());
         const response = await apiClient.get<ApiResponse<SubscriptionPlanTemplateResponse>>(`/subscription/subscription-plan-template/${id}`);
-
-        console.log("response", response.data);
-
         return response.data;
     },
     

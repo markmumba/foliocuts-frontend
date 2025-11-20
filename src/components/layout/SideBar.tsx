@@ -8,6 +8,7 @@ import {
     Settings,
     LogOut,
     List,
+    Building2,
 } from "lucide-react";
 import {
     Sidebar,
@@ -21,55 +22,79 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useMemo } from "react";
 import { useNavigate, useLocation } from "react-router";
 import { useAuth } from "@/context/AuthContext";
 import { formatRole } from "@/utils/utilities";
+import { Role } from "@/types/enums";
 
-const menuItems = [
+type MenuItem = {
+    title: string;
+    icon: typeof LayoutDashboard;
+    url: string;
+    roles?: Role[];
+};
+
+const menuItems: MenuItem[] = [
     {
         title: "Dashboard",
         icon: LayoutDashboard,
         url: "/",
+        roles: [Role.OWNER, Role.ADMIN, Role.RECEPTIONIST, Role.BARBER, Role.SERVICE_GIRL],
+    },
+    {
+        title: "Tenants",
+        icon: Building2,
+        url: "/dashboard/tenants",
+        roles: [Role.ADMIN],
     },
     {
         title: "Staff",
         icon: Users,
         url: "/dashboard/staff",
+        roles: [Role.OWNER, Role.RECEPTIONIST],
     },
     {
         title: "Service Types",
         icon: List,
         url: "/dashboard/service-types",
+        roles: [Role.OWNER, Role.RECEPTIONIST],
     },
     {
         title: "Services",
         icon: Scissors,
         url: "/dashboard/services",
+        roles: [Role.OWNER, Role.RECEPTIONIST],
     },
     {
         title: "Customers",
         icon: UserCircle,
         url: "/customers",
+        roles: [Role.OWNER, Role.RECEPTIONIST],
     },
     {
         title: "Records",
         icon: CreditCard,
         url: "/dashboard/records",
+        roles: [Role.OWNER],
     },
     {
         title: "Subscription Templates",
         icon: CreditCard,
         url: "/dashboard/subscription-templates",
+        roles: [Role.ADMIN],
     },
     {
         title: "Reports",
         icon: BarChart3,
         url: "/reports",
+        roles: [Role.OWNER, Role.ADMIN],
     },
     {
         title: "Settings",
         icon: Settings,
-        url: "/settings",
+        url: "/dashboard/settings",
+        roles: [Role.OWNER, Role.ADMIN],
     },
 ];
 
@@ -82,6 +107,11 @@ export function AppSidebar() {
         logout();
         navigate("/login");
     };
+
+    const filteredMenuItems = useMemo(() => {
+        if (!user) return [];
+        return menuItems.filter((item) => !item.roles || item.roles.includes(user.role as Role));
+    }, [user]);
 
     return (
         <Sidebar variant="sidebar">
@@ -101,7 +131,7 @@ export function AppSidebar() {
                     <SidebarGroupLabel>Navigation</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {menuItems.map((item) => (
+                            {filteredMenuItems.map((item) => (
                                 <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton
                                         asChild
