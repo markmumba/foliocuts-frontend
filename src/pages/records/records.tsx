@@ -4,13 +4,23 @@ import { Spinner } from "@/components/ui/spinner";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+    Breadcrumb,
+    BreadcrumbList,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { DataTable } from "./record-table-definition/data-table";
 import { buildRecordColumns } from "./record-table-definition/column";
 import type { RecordList } from "@/types/record";
-import { useNavigate } from "react-router";
+import { Outlet, useNavigate, useLocation, Link } from "react-router";
 
 export default function Records() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const isCreatePage = location.pathname.includes('/create');
     const [page, setPage] = useState(1);
     const pageSize = 10;
     const [search, setSearch] = useState("");
@@ -70,58 +80,78 @@ export default function Records() {
 
     return (
         <div className="p-6 space-y-6">
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-                <div>
-                    <h1 className="text-3xl font-bold mb-2">Records</h1>
-                    <p className="text-muted-foreground">
-                        Monitor customer visits, payments, and record details.
-                    </p>
-                </div>
-                <Button
-                    className="gap-2"
-                    onClick={() => navigate("/dashboard/records/create")}
-                >
-                    Create Record
-                </Button>
-            </div>
+            <Outlet />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard label="Records (page)" value={stats.total.toString()} />
-                <StatCard label="Completed" value={stats.completed.toString()} />
-                <StatCard label="Pending" value={stats.pending.toString()} />
-                <StatCard label="Revenue (page)" value={`KSh ${stats.totalRevenue.toFixed(2)}`} subtext={`Discounts: KSh ${stats.totalDiscount.toFixed(2)}`} />
-            </div>
+            {!isCreatePage && (
+                <>
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            <BreadcrumbItem>
+                                <BreadcrumbLink asChild>
+                                    <Link to="/dashboard">Dashboard</Link>
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator />
+                            <BreadcrumbItem>
+                                <BreadcrumbPage>Records</BreadcrumbPage>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
 
-            <div className="rounded-xl ">
-                <div className="flex flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-                    <Input
-                        value={search}
-                        onChange={(event) => {
-                            setPage(1);
-                            setSearch(event.target.value);
-                        }}
-                        placeholder="Search by record code, customer name, or phone..."
-                        className="w-full max-w-md"
-                    />
-                    <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground sm:justify-end">
-                        <span>
-                            Page {page}
-                            {isFetching && " (refreshing...)"}
-                        </span>
-                        <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={handlePreviousPage} disabled={page === 1}>
-                                Previous
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={handleNextPage} disabled={records.length < pageSize}>
-                                Next
-                            </Button>
+                    <div className="flex items-center justify-between gap-4 flex-wrap">
+                        <div>
+                            <h1 className="text-3xl font-bold mb-2">Records</h1>
+                            <p className="text-muted-foreground">
+                                Monitor customer visits, payments, and record details.
+                            </p>
+                        </div>
+                        <Button
+                            className="gap-2"
+                            onClick={() => navigate("/dashboard/records/create")}
+                        >
+                            Create Record
+                        </Button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <StatCard label="Records (page)" value={stats.total.toString()} />
+                        <StatCard label="Completed" value={stats.completed.toString()} />
+                        <StatCard label="Pending" value={stats.pending.toString()} />
+                        <StatCard label="Revenue (page)" value={`KES ${stats.totalRevenue.toFixed(2)}`} subtext={`Discounts: KES ${stats.totalDiscount.toFixed(2)}`} />
+                    </div>
+
+                    <div className="rounded-xl ">
+                        <div className="flex flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+                            <Input
+                                value={search}
+                                onChange={(event) => {
+                                    setPage(1);
+                                    setSearch(event.target.value);
+                                }}
+                                placeholder="Search by record code, customer name, or phone..."
+                                className="w-full max-w-md"
+                            />
+                            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground sm:justify-end">
+                                <span>
+                                    Page {page}
+                                    {isFetching && " (refreshing...)"}
+                                </span>
+                                <div className="flex gap-2">
+                                    <Button variant="outline" size="sm" onClick={handlePreviousPage} disabled={page === 1}>
+                                        Previous
+                                    </Button>
+                                    <Button variant="outline" size="sm" onClick={handleNextPage} disabled={records.length < pageSize}>
+                                        Next
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-6 pt-0">
+                            <DataTable<RecordList, unknown> columns={columns} data={records} />
                         </div>
                     </div>
-                </div>
-                <div className="p-6 pt-0">
-                    <DataTable<RecordList, unknown> columns={columns} data={records} />
-                </div>
-            </div>
+                </>
+            )}
         </div>
     );
 }

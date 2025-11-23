@@ -1,5 +1,14 @@
 import { useState } from "react";
+import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
+import {
+    Breadcrumb,
+    BreadcrumbList,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
@@ -101,6 +110,19 @@ export default function Settings() {
     return (
         <div className="min-h-screen bg-background p-6">
             <div className="max-w-5xl mx-auto space-y-6">
+                <Breadcrumb className="mb-4">
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink asChild>
+                                <Link to="/dashboard">Dashboard</Link>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbPage>Settings</BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold mb-2">Settings</h1>

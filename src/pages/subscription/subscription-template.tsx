@@ -1,9 +1,17 @@
 import { useMemo } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router";
+import { Outlet, useLocation, useNavigate, Link } from "react-router";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+    Breadcrumb,
+    BreadcrumbList,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import {  useSubscriptionTemaplatePlansAdmin } from "@/hooks/useSubscriptionTemaplatePlans";
+import { useSubscriptionTemaplatePlansAdmin } from "@/hooks/useSubscriptionTemaplatePlans";
 import type { SubscriptionPlanTemplateResponse } from "@/types/subscriptionPlanTemplate";
 import { CheckIcon, Pencil, Trash2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
@@ -37,7 +45,7 @@ export default function SubscriptionPlanTemplate() {
 
 
 
-  
+
 
 
 
@@ -64,67 +72,87 @@ export default function SubscriptionPlanTemplate() {
 
     return (
         <div className="p-6 space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold mb-2">Subscription Plan Templates</h1>
-                    <p className="text-muted-foreground">
-                        Manage the plans tenants can select when subscribing to your platform.
-                    </p>
-                </div>
-                <Button className="gap-2" onClick={() => navigate("/dashboard/subscription-templates/new")}>
-                    Create New Template
-                </Button>
-            </div>
+            {!isCreatePage && !isUpdatePage && (
+                <Breadcrumb>
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink asChild>
+                                <Link to="/dashboard">Dashboard</Link>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbPage>Subscription Templates</BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
+            )}
+            <Outlet />
+            {!isCreatePage && !isUpdatePage && (
+                <>
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <h1 className="text-3xl font-bold mb-2">Subscription Plan Templates</h1>
+                            <p className="text-muted-foreground">
+                                Manage the plans tenants can select when subscribing to your platform.
+                            </p>
+                        </div>
+                        <Button className="gap-2" onClick={() => navigate("/dashboard/subscription-templates/new")}>
+                            Create New Template
+                        </Button>
+                    </div>
 
-            {plans.length === 0 ? (
-                <div className="border border-dashed rounded-xl p-12 text-center space-y-4">
-                    <p className="text-muted-foreground">No subscription plan templates found.</p>
-                    <Button variant="outline" onClick={() => navigate("/dashboard/subscription-templates/new")}>
-                        Create your first template
-                    </Button>
-                </div>
-            ) : (
-                <div className="space-y-8">
-                    {/* Active Plans Section */}
-                    {activePlans.length > 0 && (
-                        <div className="space-y-4">
-                            <h2 className="text-xl font-semibold text-foreground">Active Plans</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                                {activePlans.map((plan) => (
-                                    <PlanCard
-                                        key={plan.id}
-                                        plan={plan}
-                                        parseFeatures={parseFeatures}
-                                        formatPrice={formatPrice}
-                                        onEdit={() => navigate(`/dashboard/subscription-templates/${plan.id}/edit`)}
-                                        onDelete={() => console.log("delete plan", plan.id)}
-                                        isDeactivated={false}
-                                    />
-                                ))}
-                            </div>
+                    {plans.length === 0 ? (
+                        <div className="border border-dashed rounded-xl p-12 text-center space-y-4">
+                            <p className="text-muted-foreground">No subscription plan templates found.</p>
+                            <Button variant="outline" onClick={() => navigate("/dashboard/subscription-templates/new")}>
+                                Create your first template
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="space-y-8">
+                            {/* Active Plans Section */}
+                            {activePlans.length > 0 && (
+                                <div className="space-y-4">
+                                    <h2 className="text-xl font-semibold text-foreground">Active Plans</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                        {activePlans.map((plan) => (
+                                            <PlanCard
+                                                key={plan.id}
+                                                plan={plan}
+                                                parseFeatures={parseFeatures}
+                                                formatPrice={formatPrice}
+                                                onEdit={() => navigate(`/dashboard/subscription-templates/${plan.id}/edit`)}
+                                                onDelete={() => console.log("delete plan", plan.id)}
+                                                isDeactivated={false}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Deactivated Plans Section */}
+                            {deactivatedPlans.length > 0 && (
+                                <div className="space-y-4">
+                                    <h2 className="text-xl font-semibold text-muted-foreground">Deactivated Plans</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                        {deactivatedPlans.map((plan) => (
+                                            <PlanCard
+                                                key={plan.id}
+                                                plan={plan}
+                                                parseFeatures={parseFeatures}
+                                                formatPrice={formatPrice}
+                                                onEdit={() => navigate(`/dashboard/subscription-templates/${plan.id}/edit`)}
+                                                onDelete={() => console.log("delete plan", plan.id)}
+                                                isDeactivated={true}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
-
-                    {/* Deactivated Plans Section */}
-                    {deactivatedPlans.length > 0 && (
-                        <div className="space-y-4">
-                            <h2 className="text-xl font-semibold text-muted-foreground">Deactivated Plans</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                                {deactivatedPlans.map((plan) => (
-                                    <PlanCard
-                                        key={plan.id}
-                                        plan={plan}
-                                        parseFeatures={parseFeatures}
-                                        formatPrice={formatPrice}
-                                        onEdit={() => navigate(`/dashboard/subscription-templates/${plan.id}/edit`)}
-                                        onDelete={() => console.log("delete plan", plan.id)}
-                                        isDeactivated={true}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
+                </>
             )}
         </div>
     );
@@ -167,11 +195,10 @@ function PlanCard({ plan, parseFeatures, formatPrice, onEdit, onDelete, isDeacti
         activateMutation.mutate(id);
     }
     return (
-        <div className={`rounded-2xl border-2 bg-card p-6 shadow-sm transition ${
-            isDeactivated
-                ? "border-muted"
-                : `hover:shadow-lg ${planColors[plan.plan] ?? "border-border"}`
-        }`}>
+        <div className={`rounded-2xl border-2 bg-card p-6 shadow-sm transition ${isDeactivated
+            ? "border-muted"
+            : `hover:shadow-lg ${planColors[plan.plan] ?? "border-border"}`
+            }`}>
             <div className="flex items-center justify-between gap-3 mb-4">
                 <div className={isDeactivated ? "opacity-50 grayscale" : ""}>
                     <p className="text-xs uppercase tracking-wide text-muted-foreground">{plan.plan}</p>

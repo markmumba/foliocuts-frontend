@@ -1,6 +1,14 @@
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, Link } from "react-router";
 import { useServicesByServiceTypeId } from "@/hooks/useService";
 import { Button } from "@/components/ui/button";
+import {
+    Breadcrumb,
+    BreadcrumbList,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ArrowLeft, Tag, DollarSign, Percent } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
@@ -10,7 +18,7 @@ export default function ServiceTypeServices() {
     const navigate = useNavigate();
     const { data: services, isLoading, error } = useServicesByServiceTypeId(serviceTypeId!);
 
-  
+
 
     if (isLoading) {
         return <Spinner />;
@@ -29,6 +37,25 @@ export default function ServiceTypeServices() {
 
     return (
         <div className="p-6 space-y-6">
+            <Breadcrumb className="mb-4">
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link to="/dashboard">Dashboard</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link to="/dashboard/service-types">Service Types</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Services</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
             <div className="flex items-center gap-4">
                 <Button
                     variant="ghost"

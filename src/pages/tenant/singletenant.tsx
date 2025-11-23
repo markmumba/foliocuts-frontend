@@ -1,9 +1,17 @@
 import { useMemo } from "react"
-import { useNavigate, useParams } from "react-router"
+import { useNavigate, useParams, Link } from "react-router"
 import { useTenant } from "@/hooks/useTenants"
 import { Spinner } from "@/components/ui/spinner"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
+import {
+    Breadcrumb,
+    BreadcrumbList,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 import { Badge } from "@/components/ui/badge"
 import {
     Table,
@@ -61,6 +69,25 @@ export default function SingleTenant() {
 
     return (
         <div className="min-h-screen bg-background p-6 -ml-[calc(var(--sidebar-width))]">
+            <Breadcrumb className="mb-4">
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link to="/dashboard">Dashboard</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbLink asChild>
+                            <Link to="/dashboard/tenants">Tenants</Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>{tenant?.businessName || "Tenant"}</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
             <Button variant="ghost" className="mb-4 gap-2" onClick={() => navigate(-1)}>
                 <ArrowLeft className="h-4 w-4" />
                 Back to tenants

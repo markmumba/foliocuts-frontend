@@ -1,5 +1,5 @@
 import type { ApiResponse } from "@/types/api";
-import type { RecordList, RecordResponse } from "@/types/record";
+import type { CreateRecordRequest, RecordList, RecordResponse } from "@/types/record";
 import { apiClient } from "./api";
 
 
@@ -16,6 +16,10 @@ export const recordService = {
     },
     getRecord: async (recordId: number): Promise<ApiResponse<RecordResponse>> => {
         const response = await apiClient.get<ApiResponse<RecordResponse>>(`/transactions/records/${recordId}`);
+        return response.data;
+    },
+    createRecord: async (request: CreateRecordRequest): Promise<ApiResponse<RecordResponse>> => {
+        const response = await apiClient.post<ApiResponse<RecordResponse>>('/transactions/create-record', request);
         return response.data;
     },
 }

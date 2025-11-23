@@ -2,10 +2,18 @@ import { useUsers } from "@/hooks/userUser";
 import { Spinner } from "@/components/ui/spinner";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+    Breadcrumb,
+    BreadcrumbList,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { buildStaffColumns } from "./staff-table-definition/column";
 import { StaffDataTable } from "./staff-table-definition/data-table";
 import { Users, UserPlus, UserCheck, UserX } from "lucide-react";
-import { Outlet, useLocation, useNavigate } from "react-router";
+import { Outlet, useLocation, useNavigate, Link } from "react-router";
 import { useCallback, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { userService } from "@/services/userService";
@@ -117,145 +125,161 @@ export default function Staff() {
     const pendingStaff = staff.filter((s) => s.status?.toUpperCase() === "PENDING").length;
     return (
         <div className="p-6 space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold mb-2">Staff Management</h1>
-                    <p className="text-muted-foreground">
-                        Manage your barbershop staff members and their roles
-                    </p>
-                </div>
-                <Button
-                    variant="default"
-                    size="lg"
-                    className="gap-2"
-                    onClick={() => navigate('/dashboard/staff/create')}
-                >
-                    <UserPlus className="w-4 h-4" />
-                    Add Staff Member
-                </Button>
-            </div>
+            {!isCreatePage && (
+                <Breadcrumb>
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink asChild>
+                                <Link to="/dashboard">Dashboard</Link>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbPage>Staff</BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
+            )}
             <Outlet />
-
             {!isCreatePage && (
                 <>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h1 className="text-3xl font-bold mb-2">Staff Management</h1>
+                            <p className="text-muted-foreground">
+                                Manage your barbershop staff members and their roles
+                            </p>
+                        </div>
+                        <Button
+                            variant="default"
+                            size="lg"
+                            className="gap-2"
+                            onClick={() => navigate('/dashboard/staff/create')}
+                        >
+                            <UserPlus className="w-4 h-4" />
+                            Add Staff Member
+                        </Button>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="border border-border rounded-lg p-6 bg-card hover:shadow-md transition-shadow">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-muted-foreground mb-1">
-                                        Total Staff
-                                    </p>
-                                    <p className="text-3xl font-bold text-card-foreground">
-                                        {totalStaff}
-                                    </p>
+                                <div className="border border-border rounded-lg p-6 bg-card hover:shadow-md transition-shadow">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-muted-foreground mb-1">
+                                                Total Staff
+                                            </p>
+                                            <p className="text-3xl font-bold text-card-foreground">
+                                                {totalStaff}
+                                            </p>
+                                        </div>
+                                        <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                            <Users className="w-6 h-6 text-primary" />
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                                    <Users className="w-6 h-6 text-primary" />
+
+                                <div className="border border-border rounded-lg p-6 bg-card hover:shadow-md transition-shadow">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-muted-foreground mb-1">
+                                                Active Staff
+                                            </p>
+                                            <p className="text-3xl font-bold text-card-foreground">
+                                                {activeStaff}
+                                            </p>
+                                        </div>
+                                        <div className="h-12 w-12 rounded-full bg-green-500/10 flex items-center justify-center">
+                                            <UserCheck className="w-6 h-6 text-green-600 dark:text-green-400" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="border border-border rounded-lg p-6 bg-card hover:shadow-md transition-shadow">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-muted-foreground mb-1">
+                                                Inactive Staff
+                                            </p>
+                                            <p className="text-3xl font-bold text-card-foreground">
+                                                {inactiveStaff}
+                                            </p>
+                                        </div>
+                                        <div className="h-12 w-12 rounded-full bg-gray-500/10 flex items-center justify-center">
+                                            <UserX className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="border border-border rounded-lg p-6 bg-card hover:shadow-md transition-shadow">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-muted-foreground mb-1">
+                                                Pending
+                                            </p>
+                                            <p className="text-3xl font-bold text-card-foreground">
+                                                {pendingStaff}
+                                            </p>
+                                        </div>
+                                        <div className="h-12 w-12 rounded-full bg-yellow-500/10 flex items-center justify-center">
+                                            <UserX className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="border border-border rounded-lg p-6 bg-card hover:shadow-md transition-shadow">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-muted-foreground mb-1">
-                                        Active Staff
-                                    </p>
-                                    <p className="text-3xl font-bold text-card-foreground">
-                                        {activeStaff}
-                                    </p>
+                            <div className="-mx-6 rounded-xl">
+                                <div className="px-6 pt-6">
+                                    <h2 className="text-xl font-semibold mb-4">All Staff Members</h2>
                                 </div>
-                                <div className="h-12 w-12 rounded-full bg-green-500/10 flex items-center justify-center">
-                                    <UserCheck className="w-6 h-6 text-green-600 dark:text-green-400" />
-                                </div>
+                                <StaffDataTable
+                                    columns={staffColumns}
+                                    data={staff}
+                                    onDeleteSelected={handleDeleteSelected}
+
+                                    isDeleting={deleteStaffMutation.isPending}
+                                />
                             </div>
-                        </div>
 
-                        <div className="border border-border rounded-lg p-6 bg-card hover:shadow-md transition-shadow">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-muted-foreground mb-1">
-                                        Inactive Staff
-                                    </p>
-                                    <p className="text-3xl font-bold text-card-foreground">
-                                        {inactiveStaff}
-                                    </p>
+                    <AlertDialog open={isDeleteResultOpen && !!deleteResult} onOpenChange={(open) => (open ? setDeleteResultOpen(true) : closeDeleteResult())}>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Delete summary</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Results from the delete request.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            {deleteResult && (
+                                <div className="space-y-3 text-sm">
+                                    <div className="grid grid-cols-2 gap-4 bg-muted/40 p-3 rounded-md">
+                                        <div>
+                                            <p className="text-muted-foreground">Requested</p>
+                                            <p className="text-lg font-semibold">{deleteResult.totalRequested}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-muted-foreground">Deleted</p>
+                                            <p className="text-lg font-semibold">{deleteResult.deleted}</p>
+                                        </div>
+                                    </div>
+                                    {deleteResult.restrictedIds?.length ? (
+                                        <p className="text-muted-foreground">
+                                            Restricted: {deleteResult.restrictedIds.join(", ")}
+                                        </p>
+                                    ) : null}
+                                    {deleteResult.notFoundIds?.length ? (
+                                        <p className="text-muted-foreground">
+                                            Not found: {deleteResult.notFoundIds.join(", ")}
+                                        </p>
+                                    ) : null}
                                 </div>
-                                <div className="h-12 w-12 rounded-full bg-gray-500/10 flex items-center justify-center">
-                                    <UserX className="w-6 h-6 text-gray-600 dark:text-gray-400" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="border border-border rounded-lg p-6 bg-card hover:shadow-md transition-shadow">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-muted-foreground mb-1">
-                                        Pending
-                                    </p>
-                                    <p className="text-3xl font-bold text-card-foreground">
-                                        {pendingStaff}
-                                    </p>
-                                </div>
-                                <div className="h-12 w-12 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                                    <UserX className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="-mx-6 rounded-xl">
-                        <div className="px-6 pt-6">
-                            <h2 className="text-xl font-semibold mb-4">All Staff Members</h2>
-                        </div>
-                        <StaffDataTable
-                            columns={staffColumns}
-                            data={staff}
-                            onDeleteSelected={handleDeleteSelected}
-
-                            isDeleting={deleteStaffMutation.isPending}
-                        />
-                    </div>
+                            )}
+                            <AlertDialogFooter>
+                                <AlertDialogCancel className="hidden" />
+                                <AlertDialogAction onClick={closeDeleteResult}>Done</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
                 </>
             )}
-            <AlertDialog open={isDeleteResultOpen && !!deleteResult} onOpenChange={(open) => (open ? setDeleteResultOpen(true) : closeDeleteResult())}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Delete summary</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Results from the delete request.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    {deleteResult && (
-                        <div className="space-y-3 text-sm">
-                            <div className="grid grid-cols-2 gap-4 bg-muted/40 p-3 rounded-md">
-                                <div>
-                                    <p className="text-muted-foreground">Requested</p>
-                                    <p className="text-lg font-semibold">{deleteResult.totalRequested}</p>
-                                </div>
-                                <div>
-                                    <p className="text-muted-foreground">Deleted</p>
-                                    <p className="text-lg font-semibold">{deleteResult.deleted}</p>
-                                </div>
-                            </div>
-                            {deleteResult.restrictedIds?.length ? (
-                                <p className="text-muted-foreground">
-                                    Restricted: {deleteResult.restrictedIds.join(", ")}
-                                </p>
-                            ) : null}
-                            {deleteResult.notFoundIds?.length ? (
-                                <p className="text-muted-foreground">
-                                    Not found: {deleteResult.notFoundIds.join(", ")}
-                                </p>
-                            ) : null}
-                        </div>
-                    )}
-                    <AlertDialogFooter>
-                        <AlertDialogCancel className="hidden" />
-                        <AlertDialogAction onClick={closeDeleteResult}>Done</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
         </div>
     );
 }

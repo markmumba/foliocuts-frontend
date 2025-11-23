@@ -30,3 +30,15 @@ export interface RecordList {
     finalAmount: number;
     status: string;
 }
+
+
+
+export interface CreateRecordRequest {
+    customerPhoneNumber: string;
+    serviceItems: ServiceItemRequest[];
+}
+
+export interface ServiceItemRequest {
+    serviceId: string;
+    staffId: string;
+}

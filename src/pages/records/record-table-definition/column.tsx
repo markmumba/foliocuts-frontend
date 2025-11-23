@@ -27,20 +27,26 @@ export const buildRecordColumns = (): ColumnDef<RecordList>[] => [
         header: 'Total Amount',
         accessorKey: 'totalAmount',
         cell: ({ row }) => {
-            return <div className="text-muted-foreground">{row.getValue("totalAmount")}</div>;
+            const amount = row.getValue("totalAmount") as number;
+            return <div className="text-muted-foreground">KES {amount?.toFixed(2) || '0.00'}</div>;
         },
     },
     {
         header: 'Discount Amount',
         accessorKey: 'discountAmount',
         cell: ({ row }) => {
-            return <div className="text-muted-foreground">{row.getValue("discountAmount")}</div>;
+            const amount = row.getValue("discountAmount") as number;
+            return <div className="text-muted-foreground">KES {amount?.toFixed(2) || '0.00'}</div>;
         },
     },
     {
         header: 'Final Amount',
         accessorKey: 'finalAmount',
+        cell: ({ row }) => {
+            const amount = row.getValue("finalAmount") as number;
+            return <div className="text-muted-foreground">KES {amount?.toFixed(2) || '0.00'}</div>;
+        },
     },
 
-]   
+]
 

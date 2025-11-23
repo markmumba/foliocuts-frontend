@@ -1,9 +1,17 @@
 import { useEffect, useMemo, useState } from "react"
-import { Outlet, useLocation, useNavigate } from "react-router"
+import { Outlet, useLocation, useNavigate, Link } from "react-router"
 import { useTenants } from "@/hooks/useTenants"
 import { Spinner } from "@/components/ui/spinner"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -95,6 +103,21 @@ export default function Tenant() {
 
   return (
     <div className=" bg-background">
+      {!isSingleTenantPage && (
+        <Breadcrumb className="px-6 py-4">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/dashboard">Dashboard</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Tenants</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      )}
       <Outlet />
 
       {!isSingleTenantPage && (
