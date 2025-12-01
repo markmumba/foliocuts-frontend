@@ -76,7 +76,7 @@ const menuItems: MenuItem[] = [
     {
         title: "Customers",
         icon: UserCircle,
-        url: "/customers",
+        url: "/dashboard/customers",
         roles: [Role.OWNER, Role.RECEPTIONIST],
     },
     {

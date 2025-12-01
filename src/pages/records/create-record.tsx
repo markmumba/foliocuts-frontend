@@ -174,6 +174,7 @@ export default function CreateRecord() {
             customerPhoneNumber: customerPhone.trim(),
             serviceItems,
         };
+        console.log("request", request);
 
         createRecordMutation.mutate(request);
     };

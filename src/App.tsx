@@ -25,6 +25,8 @@ import Settings from './pages/common/settings'
 import SingleTenant from './pages/tenant/singletenant'
 import MyShop from './pages/tenant/myshop'
 import Login from './pages/auth/login'
+import Customer from './pages/customers/customer'
+import SingleCustomer from './pages/customers/single-customer'
 
 
 
@@ -147,6 +149,23 @@ function App() {
                   element={
                     <ProtectedRoute allowedRoles={[Role.OWNER, Role.RECEPTIONIST, Role.ADMIN]} requireLayout={false}>
                       <SingleService />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
+              <Route
+                path="/dashboard/customers"
+                element={
+                  <ProtectedRoute allowedRoles={[Role.OWNER, Role.RECEPTIONIST]}>
+                    <Customer />
+                  </ProtectedRoute>
+                }
+              >
+                <Route
+                  path=":customerId"
+                  element={
+                    <ProtectedRoute allowedRoles={[Role.OWNER, Role.RECEPTIONIST]} requireLayout={false}>
+                      <SingleCustomer />
                     </ProtectedRoute>
                   }
                 />
