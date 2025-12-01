@@ -7,3 +7,10 @@ export const Role = {
 } as const;
 
 export type Role = typeof Role[keyof typeof Role];
+
+export const PaymentMethod = {
+    CASH: "CASH",
+    MPESA: "MPESA",
+} as const;
+
+export type PaymentMethod = typeof PaymentMethod[keyof typeof PaymentMethod];

@@ -68,7 +68,7 @@ export default function SingleTenant() {
     }
 
     return (
-        <div className="min-h-screen bg-background p-6 -ml-[calc(var(--sidebar-width))]">
+        <div className="min-h-screen bg-background p-6">
             <Breadcrumb className="mb-4">
                 <BreadcrumbList>
                     <BreadcrumbItem>

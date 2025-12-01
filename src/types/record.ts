@@ -1,5 +1,4 @@
 export interface RecordResponse {
-
     id: number;
     recordCode: string;
     customerPhoneNumber: string;
@@ -9,25 +8,28 @@ export interface RecordResponse {
     finalAmount: number;
     status: string;
     serviceItems: ServiceItem[];
+    message: string | null;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface ServiceItem {
-    id: number;
+    serviceItemId: number;
     serviceName: string;
     staffName: string;
     price: number;
     isFree: boolean;
-    freeReason: string;
+    freeReason: string | null;
 }
 
 export interface RecordList {
-    id: number;
+    id: string;
     recordCode: string;
     customerPhoneNumber: string;
     customerName: string;
-    totalAmount: number;
-    discountAmount: number;
-    finalAmount: number;
+    totalAmount: string;
+    discountAmount: string;
+    finalAmount: string;
     status: string;
 }
 
@@ -41,4 +43,12 @@ export interface CreateRecordRequest {
 export interface ServiceItemRequest {
     serviceId: string;
     staffId: string;
+}
+
+export interface CompleteRecordRequest {
+    paymentMethod: "CASH" | "MPESA";
+    mpesaReceiptNumber: string;
+    mpesaTransactionId: string;
+    cashReceivedBy: string;
+    notes: string;
 }

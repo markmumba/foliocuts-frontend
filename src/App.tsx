@@ -7,6 +7,7 @@ import { NotificationProvider } from './context/NotificationContext'
 import { AuthProvider } from './context/AuthContext'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { Toaster } from './components/ui/sonner'
+import { ThemeProvider } from './components/theme-provider'
 import ServiceType from './pages/services/service-type'
 import CreateService from './pages/services/create-service'
 import { Role } from './types/enums'
@@ -17,6 +18,7 @@ import Staff from './pages/staff/staff'
 import CreateStaff from './pages/staff/create-staff'
 import Records from './pages/records/records'
 import CreateRecord from './pages/records/create-record'
+import SingleRecord from './pages/records/single-record'
 import SubscriptionPlanTemplate from './pages/subscription/subscription-template'
 import CreateSubscriptionPlanTemplate from './pages/subscription/create-subscription'
 import EditSubscriptionTemplate from './pages/subscription/edit-subscription-template'
@@ -50,10 +52,11 @@ function App() {
   })
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <NotificationProvider>
-          <BrowserRouter>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <NotificationProvider>
+            <BrowserRouter>
             <Routes>
               {/* Public routes */}
               <Route path="/login" element={<Login />} />
@@ -186,6 +189,14 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path=":recordId"
+                  element={
+                    <ProtectedRoute allowedRoles={[Role.OWNER]} requireLayout={false}>
+                      <SingleRecord />
+                    </ProtectedRoute>
+                  }
+                />
               </Route>
               <Route
                 path="/dashboard/subscription-templates"
@@ -227,6 +238,7 @@ function App() {
         </NotificationProvider>
       </AuthProvider>
     </QueryClientProvider>
+    </ThemeProvider>
   )
 }
 

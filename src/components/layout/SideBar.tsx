@@ -10,6 +10,8 @@ import {
     List,
     Building2,
     Store,
+    Moon,
+    Sun,
 } from "lucide-react";
 import {
     Sidebar,
@@ -28,6 +30,7 @@ import { useNavigate, useLocation } from "react-router";
 import { useAuth } from "@/context/AuthContext";
 import { formatRole } from "@/utils/utilities";
 import { Role } from "@/types/enums";
+import { useTheme } from "next-themes";
 
 type MenuItem = {
     title: string;
@@ -109,6 +112,7 @@ export function AppSidebar() {
     const navigate = useNavigate();
     const location = useLocation();
     const { logout, user } = useAuth();
+    const { theme, setTheme } = useTheme();
 
     const handleLogout = () => {
         logout();
@@ -180,6 +184,18 @@ export function AppSidebar() {
                     </div>
                 )}
                 <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton
+                            asChild
+                            tooltip="Toggle theme"
+                        >
+                            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+                                <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                                <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                                <span>Toggle theme</span>
+                            </button>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
                     <SidebarMenuItem>
                         <SidebarMenuButton
                             asChild

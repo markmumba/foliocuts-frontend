@@ -21,6 +21,7 @@ export default function Records() {
     const navigate = useNavigate();
     const location = useLocation();
     const isCreatePage = location.pathname.includes('/create');
+    const isSingleRecordPage = /\/dashboard\/records\/\d+$/.test(location.pathname);
     const [page, setPage] = useState(1);
     const pageSize = 10;
     const [search, setSearch] = useState("");
@@ -51,8 +52,8 @@ export default function Records() {
         const total = records.length;
         const completed = records.filter((record) => record.status?.toUpperCase() === "COMPLETED").length;
         const pending = records.filter((record) => record.status?.toUpperCase() === "PENDING").length;
-        const totalRevenue = records.reduce((sum, record) => sum + (record.finalAmount || 0), 0);
-        const totalDiscount = records.reduce((sum, record) => sum + (record.discountAmount || 0), 0);
+        const totalRevenue = records.reduce((sum, record) => sum + (Number(record.finalAmount) || 0), 0);
+        const totalDiscount = records.reduce((sum, record) => sum + (Number(record.discountAmount) || 0), 0);
         return { total, completed, pending, totalRevenue, totalDiscount };
     }, [records]);
 
@@ -65,25 +66,19 @@ export default function Records() {
         setPage((prev) => prev + 1);
     };
 
-    if (isLoading) {
-        return <Spinner />;
-    }
-
-    if (error) {
-        return (
-            <Alert variant="destructive">
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error.message}</AlertDescription>
-            </Alert>
-        );
-    }
-
     return (
         <div className="p-6 space-y-6">
             <Outlet />
 
-            {!isCreatePage && (
+            {!isCreatePage && !isSingleRecordPage && (
                 <>
+                    {isLoading && <Spinner />}
+                    {error && (
+                        <Alert variant="destructive">
+                            <AlertTitle>Error</AlertTitle>
+                            <AlertDescription>{error.message}</AlertDescription>
+                        </Alert>
+                    )}
                     <Breadcrumb>
                         <BreadcrumbList>
                             <BreadcrumbItem>
@@ -147,7 +142,13 @@ export default function Records() {
                             </div>
                         </div>
                         <div className="p-6 pt-0">
-                            <DataTable<RecordList, unknown> columns={columns} data={records} />
+                            <DataTable<RecordList, unknown>
+                                columns={columns}
+                                data={records}
+                                onRowClick={(record: RecordList) =>
+                                    navigate(`/dashboard/records/${record.id}`)
+                                }
+                            />
                         </div>
                     </div>
                 </>

@@ -16,5 +16,6 @@ export function useRecord(recordId: number): UseQueryResult<ApiResponse<RecordRe
     return useQuery({
         queryKey: ['record', recordId],
         queryFn: () => recordService.getRecord(recordId),
+        enabled: !!recordId && recordId > 0,
     })
 }   
