@@ -9,10 +9,10 @@ export function useTenants(page: string, size: string, search: string) {
     })
 }
 
-export function useTenant(tenantId: string) {
+export function useTenant(tenantId: string, userPage: number = 1, userPageSize: number = 10) {
     return useQuery({
-        queryKey: ['tenant', tenantId],
-        queryFn: () => tenantService.getTenant(tenantId),
+        queryKey: ['tenant', tenantId, userPage, userPageSize],
+        queryFn: () => tenantService.getTenant(tenantId, userPage, userPageSize),
         enabled: !!tenantId,
     })
 }

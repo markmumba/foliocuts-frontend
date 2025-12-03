@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { useNavigate, useParams, Link } from "react-router"
 import { useTenant } from "@/hooks/useTenants"
 import { Spinner } from "@/components/ui/spinner"
@@ -21,13 +21,15 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { ArrowLeft, Building2, Calendar, CreditCard, Mail, MapPin, Phone, Scissors, Shield, Users } from "lucide-react"
+import { ArrowLeft, Building2, Calendar, CreditCard, Mail, MapPin, Phone, Scissors, Shield, Users, ChevronLeft, ChevronRight } from "lucide-react"
 import type { TenantServices } from "@/types/tenant"
 
 export default function SingleTenant() {
     const { tenantId } = useParams()
     const navigate = useNavigate()
-    const { data, isLoading, error } = useTenant(tenantId ?? "")
+    const [userPage, setUserPage] = useState(1)
+    const [userPageSize] = useState(10)
+    const { data, isLoading, error } = useTenant(tenantId ?? "", userPage, userPageSize)
     const tenant = data?.data
 
     const groupedServices = useMemo(() => {
@@ -140,7 +142,7 @@ export default function SingleTenant() {
                     <section className="rounded-xl border bg-card p-6">
                         <div className="mb-4 flex items-center justify-between">
                             <h2 className="text-lg font-semibold">Employees</h2>
-                            <Badge variant="secondary">{tenant.users?.length ?? 0} members</Badge>
+                            <Badge variant="secondary">{tenant.users?.totalUsers ?? 0} members</Badge>
                         </div>
                         <div className="overflow-x-auto">
                             <Table>
@@ -152,8 +154,8 @@ export default function SingleTenant() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {tenant.users?.length ? (
-                                        tenant.users.map((user) => (
+                                    {tenant.users?.data?.length ? (
+                                        tenant.users.data.map((user) => (
                                             <TableRow key={user.userId}>
                                                 <TableCell>{user.email}</TableCell>
                                                 <TableCell>{user.phoneNumber || "—"}</TableCell>
@@ -172,6 +174,40 @@ export default function SingleTenant() {
                                 </TableBody>
                             </Table>
                         </div>
+
+                        {/* Pagination Controls */}
+                        {tenant.users && tenant.users.totalPages > 1 && (
+                            <div className="mt-4 flex items-center justify-between border-t pt-4">
+                                <div className="text-sm text-muted-foreground">
+                                    Showing {((tenant.users.currentPage - 1) * tenant.users.pageSize) + 1} to{" "}
+                                    {Math.min(tenant.users.currentPage * tenant.users.pageSize, tenant.users.totalUsers)} of{" "}
+                                    {tenant.users.totalUsers} employees
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setUserPage(p => Math.max(1, p - 1))}
+                                        disabled={tenant.users.currentPage === 1}
+                                    >
+                                        <ChevronLeft className="h-4 w-4 mr-1" />
+                                        Previous
+                                    </Button>
+                                    <div className="text-sm">
+                                        Page {tenant.users.currentPage} of {tenant.users.totalPages}
+                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setUserPage(p => Math.min(tenant.users.totalPages, p + 1))}
+                                        disabled={tenant.users.currentPage === tenant.users.totalPages}
+                                    >
+                                        Next
+                                        <ChevronRight className="h-4 w-4 ml-1" />
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </section>
 
                     <section className="rounded-xl border bg-card p-6">

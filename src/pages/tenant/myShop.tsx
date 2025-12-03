@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router";
 import { Spinner } from "@/components/ui/spinner";
 import { useTenant } from "@/hooks/useTenants";
@@ -33,13 +33,17 @@ import {
     Shield,
     Users,
     Edit,
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
 import type { TenantServices } from "@/types/tenant";
 
 export default function MyShop() {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const { data: myShop, isLoading, isError, error } = useTenant(user?.tenantId ?? "");
+    const [userPage, setUserPage] = useState(1);
+    const [userPageSize] = useState(10);
+    const { data: myShop, isLoading, isError, error } = useTenant(user?.tenantId ?? "", userPage, userPageSize);
 
     console.log("MyShop render - isLoading:", isLoading, "isError:", isError, "myShop:", myShop);
     const tenant = myShop?.data;
@@ -186,7 +190,7 @@ export default function MyShop() {
                         <div className="mb-4 flex items-center justify-between">
                             <h2 className="text-lg font-semibold">Staff Members</h2>
                             <div className="flex items-center gap-2">
-                                <Badge variant="secondary">{tenant.users?.length ?? 0} members</Badge>
+                                <Badge variant="secondary">{tenant.users?.totalUsers ?? 0} members</Badge>
                                 <Button size="sm" onClick={() => navigate("/dashboard/staff")}>
                                     Manage Staff
                                 </Button>
@@ -202,8 +206,8 @@ export default function MyShop() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {tenant.users?.length ? (
-                                        tenant.users.map((staffMember) => (
+                                    {tenant.users?.data?.length ? (
+                                        tenant.users.data.map((staffMember) => (
                                             <TableRow key={staffMember.userId}>
                                                 <TableCell>{staffMember.email}</TableCell>
                                                 <TableCell>{staffMember.phoneNumber || "—"}</TableCell>
@@ -222,6 +226,40 @@ export default function MyShop() {
                                 </TableBody>
                             </Table>
                         </div>
+
+                        {/* Pagination Controls */}
+                        {tenant.users && tenant.users.totalPages > 1 && (
+                            <div className="mt-4 flex items-center justify-between border-t pt-4">
+                                <div className="text-sm text-muted-foreground">
+                                    Showing {((tenant.users.currentPage - 1) * tenant.users.pageSize) + 1} to{" "}
+                                    {Math.min(tenant.users.currentPage * tenant.users.pageSize, tenant.users.totalUsers)} of{" "}
+                                    {tenant.users.totalUsers} staff members
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setUserPage(p => Math.max(1, p - 1))}
+                                        disabled={tenant.users.currentPage === 1}
+                                    >
+                                        <ChevronLeft className="h-4 w-4 mr-1" />
+                                        Previous
+                                    </Button>
+                                    <div className="text-sm">
+                                        Page {tenant.users.currentPage} of {tenant.users.totalPages}
+                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setUserPage(p => Math.min(tenant.users.totalPages, p + 1))}
+                                        disabled={tenant.users.currentPage === tenant.users.totalPages}
+                                    >
+                                        Next
+                                        <ChevronRight className="h-4 w-4 ml-1" />
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </section>
 
                     {/* Services Section */}

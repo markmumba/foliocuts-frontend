@@ -24,13 +24,23 @@ import {
 import { useUsers } from "@/hooks/userUser";
 import { useServices } from "@/hooks/useService";
 import { recordService } from "@/services/recordService";
+import { paymentService } from "@/services/paymentService";
 import { useNotification } from "@/context/NotificationContext";
-import type { CreateRecordRequest, CompleteRecordRequest, ServiceItemRequest } from "@/types/record";
+import type { CreateRecordRequest, ServiceItemRequest } from "@/types/record";
 import type { ServiceResponse } from "@/types/service";
+import type { PaymentRequest } from "@/types/payment";
 import { AxiosError } from "axios";
-import { ArrowLeft, ArrowRight, Phone, Scissors, Sparkles, CreditCard, Receipt, Wallet } from "lucide-react";
+import {
+    ArrowLeft,
+    ArrowRight,
+    Phone,
+    Scissors,
+    Sparkles,
+    CreditCard,
+    Receipt,
+    Wallet,
+} from "lucide-react";
 import type { User } from "@/types/user";
-import { Textarea } from "@/components/ui/textarea";
 
 type SelectedService = {
     serviceId: string;
@@ -53,14 +63,7 @@ export default function CreateRecord() {
     const [barberSelections, setBarberSelections] = useState<Map<string, string>>(new Map()); // serviceId -> staffId
     const [serviceGirlSelections, setServiceGirlSelections] = useState<Map<string, string>>(new Map()); // serviceId -> staffId
     const [createdRecordId, setCreatedRecordId] = useState<number | null>(null);
-
-    // Payment form state
     const [paymentMethod, setPaymentMethod] = useState<"CASH" | "MPESA">("CASH");
-    const [mpesaReceiptNumber, setMpesaReceiptNumber] = useState("");
-    const [mpesaTransactionId, setMpesaTransactionId] = useState("");
-    const [cashReceivedBy, setCashReceivedBy] = useState("");
-    const [notes, setNotes] = useState("");
-
     const { data: staffData, isLoading: staffLoading, error: staffError } = useUsers();
     const { data: servicesData, isLoading: servicesLoading, error: servicesError } = useServices();
 
@@ -88,19 +91,20 @@ export default function CreateRecord() {
         },
     });
 
-    const completeRecordMutation = useMutation({
-        mutationFn: (request: CompleteRecordRequest) => {
-            if (!createdRecordId) throw new Error("Record ID not found");
-            return recordService.completeRecord(createdRecordId, request);
-        },
+    const makePaymentMutation = useMutation({
+        mutationFn: (request: PaymentRequest) => paymentService.initiatePayment(request),
         onSuccess: (response) => {
-            notifySuccess(response.message || "Payment completed successfully");
+            notifySuccess(response.message || "Payment initiated successfully");
             queryClient.invalidateQueries({ queryKey: ['records'] });
-            queryClient.invalidateQueries({ queryKey: ['record', createdRecordId] });
-            navigate(`/dashboard/records/${createdRecordId}`);
+            if (createdRecordId) {
+                queryClient.invalidateQueries({ queryKey: ['record', createdRecordId] });
+                navigate(`/dashboard/records/${createdRecordId}`);
+            } else {
+                navigate("/dashboard/records");
+            }
         },
         onError: (error: unknown) => {
-            let message = "Failed to complete payment";
+            let message = "Failed to initiate payment";
             if (error instanceof AxiosError) {
                 const apiError = error.response?.data as { message?: string } | undefined;
                 message = apiError?.message || error.message || message;
@@ -111,7 +115,6 @@ export default function CreateRecord() {
         },
     });
 
-    // Filter staff by role
     const barbers = useMemo(() => {
         if (!staffData?.data) return [];
         return staffData.data.filter((staff: User) => staff.role === "BARBER" && staff.status === "ACTIVE");
@@ -122,7 +125,6 @@ export default function CreateRecord() {
         return staffData.data.filter((staff: User) => staff.role === "SERVICE_GIRL" && staff.status === "ACTIVE");
     }, [staffData]);
 
-    // Filter services by staff role
     const barberServices = useMemo(() => {
         if (!servicesData?.data) return [];
         return servicesData.data.filter((service: ServiceResponse) =>
@@ -231,7 +233,7 @@ export default function CreateRecord() {
                     serviceId,
                     staffId,
                     serviceName: service.name,
-                    staffName: staff.fullName,
+                    staffName: staff.fullName ?? "Unknown",
                     price: service.price,
                 });
             }
@@ -245,7 +247,7 @@ export default function CreateRecord() {
                     serviceId,
                     staffId,
                     serviceName: service.name,
-                    staffName: staff.fullName,
+                    staffName: staff.fullName ?? "Unknown",
                     price: service.price,
                 });
             }
@@ -522,7 +524,7 @@ export default function CreateRecord() {
                         ) : (
                             <div className="mx-auto">
                                 {/* Receipt Container */}
-                                <div className="bg-white border-2 border-dashed border-muted-foreground/30 p-8  text-xl">
+                                <div className="bg-card text-card-foreground border-2 border-dashed border-border p-8 shadow-sm">
                                     {/* Header */}
                                     <div className="text-center space-y-1 mb-6">
                                         <div className="flex justify-center mb-2">
@@ -638,7 +640,7 @@ export default function CreateRecord() {
                                         {[...Array(20)].map((_, i) => (
                                             <div
                                                 key={i}
-                                                className="w-1 bg-foreground"
+                                                className="w-1 bg-foreground/60"
                                                 style={{ height: `${Math.random() * 20 + 10}px` }}
                                             ></div>
                                         ))}
@@ -731,60 +733,6 @@ export default function CreateRecord() {
                                 </FieldContent>
                             </Field>
 
-                            {/* Cash Fields */}
-                            {paymentMethod === "CASH" && (
-                                <Field>
-                                    <FieldLabel>Received By</FieldLabel>
-                                    <FieldContent>
-                                        <Input
-                                            placeholder="Enter staff name who received payment"
-                                            value={cashReceivedBy}
-                                            onChange={(e) => setCashReceivedBy(e.target.value)}
-                                        />
-                                    </FieldContent>
-                                </Field>
-                            )}
-
-                            {/* M-Pesa Fields */}
-                            {paymentMethod === "MPESA" && (
-                                <>
-                                    <Field>
-                                        <FieldLabel>M-Pesa Receipt Number</FieldLabel>
-                                        <FieldContent>
-                                            <Input
-                                                placeholder="Enter M-Pesa receipt number"
-                                                value={mpesaReceiptNumber}
-                                                onChange={(e) => setMpesaReceiptNumber(e.target.value)}
-                                            />
-                                        </FieldContent>
-                                    </Field>
-                                    <Field>
-                                        <FieldLabel>M-Pesa Transaction ID</FieldLabel>
-                                        <FieldContent>
-                                            <Input
-                                                placeholder="Enter M-Pesa transaction ID"
-                                                value={mpesaTransactionId}
-                                                onChange={(e) => setMpesaTransactionId(e.target.value)}
-                                            />
-                                        </FieldContent>
-                                    </Field>
-                                </>
-                            )}
-
-                            {/* Notes */}
-                            <Field>
-                                <FieldLabel>Notes (Optional)</FieldLabel>
-                                <FieldContent>
-                                    <Textarea
-                                        placeholder="Add any additional notes..."
-                                        value={notes}
-                                        onChange={(e) => setNotes(e.target.value)}
-                                        rows={3}
-                                    />
-                                </FieldContent>
-                            </Field>
-
-                            {/* Payment Summary */}
                             <div className="rounded-lg border bg-muted/30 p-6">
                                 <h3 className="font-semibold mb-4">Payment Summary</h3>
                                 <div className="space-y-2 text-sm">
@@ -807,36 +755,26 @@ export default function CreateRecord() {
                             </Button>
                             <Button
                                 onClick={() => {
-                                    if (paymentMethod === "CASH" && !cashReceivedBy.trim()) {
-                                        notifyError("Please enter who received the cash payment", "Validation Error");
+                                    if (!createdRecordId) {
+                                        notifyError("Record not found for payment", "Payment Error");
                                         return;
                                     }
-                                    if (paymentMethod === "MPESA") {
-                                        if (!mpesaReceiptNumber.trim()) {
-                                            notifyError("Please enter M-Pesa receipt number", "Validation Error");
-                                            return;
-                                        }
-                                        if (!mpesaTransactionId.trim()) {
-                                            notifyError("Please enter M-Pesa transaction ID", "Validation Error");
-                                            return;
-                                        }
-                                    }
 
-                                    const request: CompleteRecordRequest = {
+                                    const request: PaymentRequest = {
                                         paymentMethod,
-                                        mpesaReceiptNumber: mpesaReceiptNumber.trim() || "",
-                                        mpesaTransactionId: mpesaTransactionId.trim() || "",
-                                        cashReceivedBy: cashReceivedBy.trim() || "",
-                                        notes: notes.trim() || "",
+                                        amount: totalAmount.toFixed(2),
+                                        recordId: String(createdRecordId),
+                                        customerNumber: customerPhone.trim(),
+                                        message: `Payment for record ${createdRecordId}`,
                                     };
 
-                                    completeRecordMutation.mutate(request);
+                                    makePaymentMutation.mutate(request);
                                 }}
-                                disabled={completeRecordMutation.isPending}
+                                disabled={makePaymentMutation.isPending}
                                 className="min-w-[160px]"
                                 size="lg"
                             >
-                                {completeRecordMutation.isPending ? (
+                                {makePaymentMutation.isPending ? (
                                     <>
                                         <Spinner className="w-4 h-4 mr-2" />
                                         Processing...
@@ -844,7 +782,7 @@ export default function CreateRecord() {
                                 ) : (
                                     <>
                                         <CreditCard className="w-4 h-4 mr-2" />
-                                        Complete Payment
+                                        Make Payment
                                     </>
                                 )}
                             </Button>

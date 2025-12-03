@@ -1,16 +1,16 @@
 import type { Role } from "./enums";
 
-
-
 export interface User {
     id: number;
     email: string;
-    fullName: string;
-    phone: string;
-    role: string;
+    fullName?: string | null;
+    phoneNumber?: string | null;
+    phone?: string | null;
+    role: string | null;
     status: string;
+    tenantId?: string | null;
     createdAt: string;
-    updatedAt: string;
+    updatedAt?: string;
 }
 
 export interface CreateStaffRequest {

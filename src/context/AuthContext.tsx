@@ -1,16 +1,7 @@
 import { createContext, useState, useEffect, useCallback, useContext, type ReactNode } from "react";
+import type { User } from "@/types/user";
 
-
-export interface User {
-    id: number;
-    email: string;
-    fullName: string | null;
-    phone: string | null;
-    role: string | null;
-    status: string;
-    tenantId?: string | null;
-    createdAt: string;
-}
+export type { User };
 
 interface AuthContextType {
     user: User | null;

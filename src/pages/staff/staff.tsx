@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { buildStaffColumns } from "./staff-table-definition/column";
 import { StaffDataTable } from "./staff-table-definition/data-table";
-import { Users, UserPlus, UserCheck, UserX } from "lucide-react";
+import {  LayoutGrid, Table2, Search, Plus } from "lucide-react";
 import { Outlet, useLocation, useNavigate, Link } from "react-router";
 import { useCallback, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -30,6 +30,10 @@ import {
     AlertDialogTitle,
     AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
+import { StaffList } from "@/components/staff/StaffList";
+import { StaffDetail } from "@/components/staff/StaffDetail";
+import { AddStaffModal } from "@/components/staff/AddStaffModal";
+import type { StaffFormData } from "@/components/staff/AddStaffModal";
 
 export default function Staff() {
     const { data: staffList, isLoading, error } = useUsers();
@@ -40,6 +44,11 @@ export default function Staff() {
     const { success: notifySuccess, error: notifyError } = useNotification();
     const [deleteResult, setDeleteResult] = useState<DeleteStaffResponse | null>(null);
     const [isDeleteResultOpen, setDeleteResultOpen] = useState(false);
+    const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
+    const [selectedStaff, setSelectedStaff] = useState<User | null>(null);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filterRole, setFilterRole] = useState('all');
 
     const deleteStaffMutation = useMutation({
         mutationFn: (staffIds: number[]) => userService.deleteMultipleStaff(staffIds),
@@ -105,6 +114,37 @@ export default function Staff() {
         [handleDeleteSingle, handleEdit]
     );
 
+    const handleAddStaff = (data: StaffFormData) => {
+        // TODO: Implement staff creation API call
+        console.log('Creating staff:', data);
+        notifySuccess('Staff member will be created (API integration pending)');
+        setShowAddModal(false);
+    };
+
+    const handleEditStaff = () => {
+        if (selectedStaff) {
+            navigate(`/dashboard/staff/${selectedStaff.id}`);
+        }
+    };
+
+    const handleDeleteStaff = async () => {
+        if (selectedStaff) {
+            await handleDeleteSingle(selectedStaff.id);
+            setSelectedStaff(null);
+        }
+    };
+
+    const filteredStaff = useMemo(() => {
+        const staff = staffList?.data || [];
+        return staff.filter(member => {
+            const matchesSearch = member.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                member.role?.toLowerCase().includes(searchQuery.toLowerCase());
+            const matchesFilter = filterRole === 'all' ||
+                                member.role?.toLowerCase().includes(filterRole.toLowerCase());
+            return matchesSearch && matchesFilter;
+        });
+    }, [staffList, searchQuery, filterRole]);
+
     if (isLoading) {
         return <Spinner />;
     }
@@ -119,10 +159,6 @@ export default function Staff() {
     }
 
     const staff = staffList?.data || [];
-    const totalStaff = staff.length;
-    const activeStaff = staff.filter((s) => s.status?.toUpperCase() === "ACTIVE").length;
-    const inactiveStaff = staff.filter((s) => s.status?.toUpperCase() === "INACTIVE").length;
-    const pendingStaff = staff.filter((s) => s.status?.toUpperCase() === "PENDING").length;
     return (
         <div className="p-6 space-y-6">
             {!isCreatePage && (
@@ -141,7 +177,7 @@ export default function Staff() {
                 </Breadcrumb>
             )}
             <Outlet />
-            {!isCreatePage && (
+            {!isCreatePage && !selectedStaff && (
                 <>
                     <div className="flex items-center justify-between">
                         <div>
@@ -150,95 +186,88 @@ export default function Staff() {
                                 Manage your barbershop staff members and their roles
                             </p>
                         </div>
-                        <Button
-                            variant="default"
-                            size="lg"
-                            className="gap-2"
-                            onClick={() => navigate('/dashboard/staff/create')}
-                        >
-                            <UserPlus className="w-4 h-4" />
-                            Add Staff Member
-                        </Button>
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center border border-border rounded-lg p-1">
+                                <button
+                                    onClick={() => setViewMode('cards')}
+                                    className={`p-2 rounded ${
+                                        viewMode === 'cards'
+                                            ? 'bg-primary text-primary-foreground'
+                                            : 'text-muted-foreground hover:text-foreground'
+                                    } transition-colors`}
+                                    title="Card View"
+                                >
+                                    <LayoutGrid className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('table')}
+                                    className={`p-2 rounded ${
+                                        viewMode === 'table'
+                                            ? 'bg-primary text-primary-foreground'
+                                            : 'text-muted-foreground hover:text-foreground'
+                                    } transition-colors`}
+                                    title="Table View"
+                                >
+                                    <Table2 className="w-4 h-4" />
+                                </button>
+                            </div>
+                            <Button
+                                variant="default"
+                                size="lg"
+                                className="gap-2"
+                                onClick={() => setShowAddModal(true)}
+                            >
+                                <Plus className="w-4 h-4" />
+                                Add Staff Member
+                            </Button>
+                        </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <div className="border border-border rounded-lg p-6 bg-card hover:shadow-md transition-shadow">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                Total Staff
-                                            </p>
-                                            <p className="text-3xl font-bold text-card-foreground">
-                                                {totalStaff}
-                                            </p>
-                                        </div>
-                                        <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                                            <Users className="w-6 h-6 text-primary" />
-                                        </div>
+                    {/* Search and Filter Bar for Card View */}
+                            {viewMode === 'cards' && (
+                                <div className="flex flex-col sm:flex-row gap-4">
+                                    <div className="relative flex-1">
+                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                                        <input
+                                            type="text"
+                                            placeholder="Search staff by name or role..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent bg-background text-foreground"
+                                        />
                                     </div>
-                                </div>
 
-                                <div className="border border-border rounded-lg p-6 bg-card hover:shadow-md transition-shadow">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                Active Staff
-                                            </p>
-                                            <p className="text-3xl font-bold text-card-foreground">
-                                                {activeStaff}
-                                            </p>
-                                        </div>
-                                        <div className="h-12 w-12 rounded-full bg-green-500/10 flex items-center justify-center">
-                                            <UserCheck className="w-6 h-6 text-green-600 dark:text-green-400" />
-                                        </div>
-                                    </div>
+                                    <select
+                                        value={filterRole}
+                                        onChange={(e) => setFilterRole(e.target.value)}
+                                        className="px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent bg-background text-foreground"
+                                    >
+                                        <option value="all">All Roles</option>
+                                        <option value="barber">Barbers</option>
+                                        <option value="receptionist">Receptionists</option>
+                                        <option value="service">Service Staff</option>
+                                    </select>
                                 </div>
+                            )}
 
-                                <div className="border border-border rounded-lg p-6 bg-card hover:shadow-md transition-shadow">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                Inactive Staff
-                                            </p>
-                                            <p className="text-3xl font-bold text-card-foreground">
-                                                {inactiveStaff}
-                                            </p>
-                                        </div>
-                                        <div className="h-12 w-12 rounded-full bg-gray-500/10 flex items-center justify-center">
-                                            <UserX className="w-6 h-6 text-gray-600 dark:text-gray-400" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="border border-border rounded-lg p-6 bg-card hover:shadow-md transition-shadow">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-sm font-medium text-muted-foreground mb-1">
-                                                Pending
-                                            </p>
-                                            <p className="text-3xl font-bold text-card-foreground">
-                                                {pendingStaff}
-                                            </p>
-                                        </div>
-                                        <div className="h-12 w-12 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                                            <UserX className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="-mx-6 rounded-xl">
-                                <div className="px-6 pt-6">
-                                    <h2 className="text-xl font-semibold mb-4">All Staff Members</h2>
-                                </div>
-                                <StaffDataTable
-                                    columns={staffColumns}
-                                    data={staff}
-                                    onDeleteSelected={handleDeleteSelected}
-
-                                    isDeleting={deleteStaffMutation.isPending}
+                             {viewMode === 'cards' ? (
+                                <StaffList
+                                    staff={filteredStaff}
+                                    onSelectStaff={setSelectedStaff}
                                 />
-                            </div>
+                            ) : (
+                                <div className="-mx-6 rounded-xl">
+                                    <div className="px-6 pt-6">
+                                        <h2 className="text-xl font-semibold mb-4">All Staff Members</h2>
+                                    </div>
+                                    <StaffDataTable
+                                        columns={staffColumns}
+                                        data={staff}
+                                        onDeleteSelected={handleDeleteSelected}
+                                        isDeleting={deleteStaffMutation.isPending}
+                                    />
+                                </div>
+                            )}
 
                     <AlertDialog open={isDeleteResultOpen && !!deleteResult} onOpenChange={(open) => (open ? setDeleteResultOpen(true) : closeDeleteResult())}>
                         <AlertDialogContent>
@@ -279,6 +308,24 @@ export default function Staff() {
                         </AlertDialogContent>
                     </AlertDialog>
                 </>
+            )}
+
+            {/* Staff Detail View */}
+            {!isCreatePage && selectedStaff && (
+                <StaffDetail
+                    staff={selectedStaff}
+                    onBack={() => setSelectedStaff(null)}
+                    onEdit={handleEditStaff}
+                    onDelete={handleDeleteStaff}
+                />
+            )}
+
+            {/* Add Staff Modal */}
+            {showAddModal && (
+                <AddStaffModal
+                    onClose={() => setShowAddModal(false)}
+                    onSubmit={handleAddStaff}
+                />
             )}
         </div>
     );

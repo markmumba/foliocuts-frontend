@@ -14,8 +14,13 @@ export const tenantService = {
         });
         return response.data;
     },
-    getTenant: async (tenantId: string): Promise<ApiResponse<Tenant>> => {
-        const response = await apiClient.get<ApiResponse<Tenant>>(`/tenants/${tenantId}`);
+    getTenant: async (tenantId: string, userPage: number = 1, userPageSize: number = 10): Promise<ApiResponse<Tenant>> => {
+        const response = await apiClient.get<ApiResponse<Tenant>>(`/tenants/${tenantId}`, {
+            params: {
+                userPage,
+                userPageSize,
+            },
+        });
         return response.data;
     },
 

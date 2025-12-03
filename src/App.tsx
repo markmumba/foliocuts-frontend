@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Register from './pages/auth/register'
 import { NotificationProvider } from './context/NotificationContext'
 import { AuthProvider } from './context/AuthContext'
+import { TenantProvider } from './context/TenantContext'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { Toaster } from './components/ui/sonner'
 import { ThemeProvider } from './components/theme-provider'
@@ -55,8 +56,9 @@ function App() {
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <NotificationProvider>
-            <BrowserRouter>
+          <TenantProvider>
+            <NotificationProvider>
+              <BrowserRouter>
             <Routes>
               {/* Public routes */}
               <Route path="/login" element={<Login />} />
@@ -232,10 +234,11 @@ function App() {
                 }
               />
               <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </BrowserRouter>
-          <Toaster />
-        </NotificationProvider>
+              </Routes>
+            </BrowserRouter>
+            <Toaster />
+          </NotificationProvider>
+        </TenantProvider>
       </AuthProvider>
     </QueryClientProvider>
     </ThemeProvider>
