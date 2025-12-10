@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useCallback, useContext, type ReactNode } from "react";
 import type { User } from "@/types/user";
+import { authService } from "@/services/authService";
 
 export type { User };
 
@@ -93,17 +94,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, []);
 
     const refreshAccessToken = useCallback(async () => {
-        // TODO: Implement token refresh logic when refresh endpoint is available
-        // For now, just clear auth if token is invalid
         const stored = getStoredAuth();
         if (!stored.refreshToken) {
             logout();
             throw new Error('No refresh token available');
         }
 
-        // Placeholder for refresh token API call
-        // const response = await apiClient.post('/auth/refresh', { refreshToken: stored.refreshToken });
-        // login(response.data.accessToken, response.data.refreshToken, user);
+        try {
+            const response = await authService.refreshToken({
+                refreshToken: stored.refreshToken
+            });
+
+            const newAccessToken = response.data.accessToken;
+            const newRefreshToken = response.data.refreshToken;
+
+            // Update tokens in storage and state
+            localStorage.setItem('accessToken', newAccessToken);
+            localStorage.setItem('refreshToken', newRefreshToken);
+            setAccessToken(newAccessToken);
+            setRefreshToken(newRefreshToken);
+
+            return newAccessToken;
+        } catch (error) {
+            console.error('Failed to refresh token:', error);
+            logout();
+            throw error;
+        }
     }, [logout]);
 
     const updateUser = useCallback((updatedUser: User) => {
@@ -120,10 +136,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         error,
         login,
         logout,
-        refreshAccessToken,
+        refreshAccessToken: async () => {
+            await refreshAccessToken();
+        },
         updateUser,
     };
-
+    
     return (
         <AuthContext.Provider value={value}>
             {children}
