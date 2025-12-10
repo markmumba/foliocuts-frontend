@@ -32,8 +32,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { StaffList } from "@/components/staff/StaffList";
 import { StaffDetail } from "@/components/staff/StaffDetail";
-import { AddStaffModal } from "@/components/staff/AddStaffModal";
-import type { StaffFormData } from "@/components/staff/AddStaffModal";
 
 export default function Staff() {
     const { data: staffList, isLoading, error } = useUsers();
@@ -46,7 +44,6 @@ export default function Staff() {
     const [isDeleteResultOpen, setDeleteResultOpen] = useState(false);
     const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
     const [selectedStaff, setSelectedStaff] = useState<User | null>(null);
-    const [showAddModal, setShowAddModal] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [filterRole, setFilterRole] = useState('all');
 
@@ -113,13 +110,6 @@ export default function Staff() {
             }),
         [handleDeleteSingle, handleEdit]
     );
-
-    const handleAddStaff = (data: StaffFormData) => {
-        // TODO: Implement staff creation API call
-        console.log('Creating staff:', data);
-        notifySuccess('Staff member will be created (API integration pending)');
-        setShowAddModal(false);
-    };
 
     const handleEditStaff = () => {
         if (selectedStaff) {
@@ -215,10 +205,10 @@ export default function Staff() {
                                 variant="default"
                                 size="lg"
                                 className="gap-2"
-                                onClick={() => setShowAddModal(true)}
+                                onClick={() => navigate('/dashboard/staff/create')}
                             >
                                 <Plus className="w-4 h-4" />
-                                Add Staff Member
+                                Add Staff
                             </Button>
                         </div>
                     </div>
@@ -317,14 +307,6 @@ export default function Staff() {
                     onBack={() => setSelectedStaff(null)}
                     onEdit={handleEditStaff}
                     onDelete={handleDeleteStaff}
-                />
-            )}
-
-            {/* Add Staff Modal */}
-            {showAddModal && (
-                <AddStaffModal
-                    onClose={() => setShowAddModal(false)}
-                    onSubmit={handleAddStaff}
                 />
             )}
         </div>

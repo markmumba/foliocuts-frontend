@@ -69,7 +69,7 @@ const menuItems: MenuItem[] = [
         title: "Service Types",
         icon: List,
         url: "/dashboard/service-types",
-        roles: [Role.OWNER, Role.RECEPTIONIST],
+        roles: [Role.ADMIN, Role.OWNER, Role.RECEPTIONIST],
     },
     {
         title: "Services",

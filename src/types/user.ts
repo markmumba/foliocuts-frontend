@@ -34,3 +34,67 @@ export interface CreateEmployeesResponse {
     createdEmails: string[];
     message: string;
 }
+
+// Staff Performance Types
+export interface TodayTotals {
+    services: number;
+    revenue: string | number;
+    commission: string | number;
+}
+
+export interface EmployeePerformanceSummary {
+    totalEmployees: number;
+    activeEmployees: number;
+    inactiveEmployees: number;
+    todayTotals: TodayTotals;
+}
+
+export interface SingleEmployeePerformanceSummary {
+    services: number;
+    revenue: string | number;
+    commission: string | number;
+    servicesPerformed?: string[];
+}
+
+export interface Performance {
+    services: number;
+    revenue: string | number;
+    commission: string | number;
+}
+
+export interface SingleEmployeePerformance {
+    todaysPerformance: Performance;
+    weeklyPerformance: Performance;
+    monthlyPerformance: Performance;
+    assignedServices: string[];
+}
+
+export interface DailyPerformance {
+    day: string;
+    services: number;
+    revenue: string | number;
+    commission: string | number;
+}
+
+export interface WeeklyPerformance {
+    data: DailyPerformance[];
+}
+
+export interface ServiceCommissionRate {
+    service: string;
+    rate: string | number;
+}
+
+export interface EmployeeServices {
+    assignedServices: string[];
+    commissionRates: ServiceCommissionRate[];
+}
+
+export interface RecentActivity {
+    recordId: number;
+    customerNumber: string;
+    serviceName: string;
+    commission: string | number;
+    amount: string | number;
+    createdAt: string;
+}

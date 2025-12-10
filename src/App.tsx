@@ -203,7 +203,7 @@ function App() {
               <Route
                 path="/dashboard/subscription-templates"
                 element={
-                  <ProtectedRoute allowedRoles={[Role.ADMIN, Role.OWNER]}>
+                  <ProtectedRoute allowedRoles={[Role.ADMIN]}>
                     <SubscriptionPlanTemplate />
                   </ProtectedRoute>
                 }

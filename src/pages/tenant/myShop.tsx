@@ -1,10 +1,9 @@
-import { useMemo, useState } from "react";
-import { useNavigate, Link } from "react-router";
+import { useState } from "react";
+import { Link } from "react-router";
 import { Spinner } from "@/components/ui/spinner";
 import { useTenant } from "@/hooks/useTenants";
 import { useAuth } from "@/context/AuthContext";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
 import {
     Breadcrumb,
     BreadcrumbList,
@@ -13,65 +12,33 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Badge } from "@/components/ui/badge";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import {
-    Building2,
-    Calendar,
-    CreditCard,
-    Mail,
-    MapPin,
-    Phone,
+    Store,
     Scissors,
-    Shield,
-    Users,
-    Edit,
-    ChevronLeft,
-    ChevronRight,
+    DollarSign,
+    Award,
+    CreditCard,
 } from "lucide-react";
-import type { TenantServices } from "@/types/tenant";
+import { ShopProfile } from "@/components/shop/ShopProfile";
+import { ServicesManagement } from "@/components/shop/ServicesManagement";
+import { CommissionSettings } from "@/components/shop/CommissionSettings";
+import { LoyaltySettings } from "@/components/shop/LoyaltySettings";
+import { SubscriptionCard } from "@/components/shop/SubscriptionCard";
 
 export default function MyShop() {
     const { user } = useAuth();
-    const navigate = useNavigate();
-    const [userPage, setUserPage] = useState(1);
-    const [userPageSize] = useState(10);
-    const { data: myShop, isLoading, isError, error } = useTenant(user?.tenantId ?? "", userPage, userPageSize);
+    const [activeTab, setActiveTab] = useState('profile');
+    const { data: myShop, isLoading, isError, error } = useTenant(user?.tenantId ?? "");
 
-    console.log("MyShop render - isLoading:", isLoading, "isError:", isError, "myShop:", myShop);
     const tenant = myShop?.data;
-    console.log("tenant data:", tenant);
 
-    const groupedServices = useMemo(() => {
-        if (!tenant?.services?.length) {
-            return [];
-        }
-
-        const groups = tenant.services.reduce<Record<string, TenantServices[]>>((acc, service) => {
-            if (!acc[service.serviceType]) {
-                acc[service.serviceType] = [];
-            }
-            acc[service.serviceType].push(service);
-            return acc;
-        }, {});
-
-        return Object.entries(groups).map(([type, services]) => ({ type, services }));
-    }, [tenant?.services]);
-
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-        });
-    };
+    const tabs = [
+        { id: 'profile', label: 'Shop Profile', icon: Store },
+        { id: 'services', label: 'Services & Pricing', icon: Scissors },
+        { id: 'commission', label: 'Commission Rates', icon: DollarSign },
+        { id: 'loyalty', label: 'Loyalty Program', icon: Award },
+        { id: 'subscription', label: 'Subscription', icon: CreditCard },
+    ];
 
     if (!user?.tenantId) {
         return (
@@ -100,7 +67,7 @@ export default function MyShop() {
     }
 
     return (
-        <div className="p-6 space-y-6">
+        <div className="p-8">
             <Breadcrumb className="mb-4">
                 <BreadcrumbList>
                     <BreadcrumbItem>
@@ -114,303 +81,40 @@ export default function MyShop() {
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
-            {/* Header Section */}
-            <div className="overflow-hidden rounded-2xl border bg-linear-to-r from-primary to-primary/70 text-primary-foreground shadow-xl">
-                <div className="p-6 sm:p-10">
-                    <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                        <div className="flex items-start gap-4">
-                            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-foreground/20">
-                                <Building2 className="h-8 w-8" />
-                            </div>
-                            <div>
-                                <div className="mb-2 flex flex-wrap items-center gap-2 text-sm">
-                                    <Badge variant="secondary">{tenant.subscriptionPlan}</Badge>
-                                    <Badge variant={tenant.status === "ACTIVE" ? "default" : "secondary"}>
-                                        {tenant.status}
-                                    </Badge>
-                                </div>
-                                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{tenant.businessName}</h1>
-                                <p className="text-sm text-primary-foreground/80">{tenant.subdomain}.foliocuts.com</p>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
-                            <StatPill label="Staff" value={tenant.numberOfUsers} icon={<Users className="h-4 w-4" />} />
-                            <StatPill label="Services" value={tenant.numberOfServices} icon={<Scissors className="h-4 w-4" />} />
-                            <StatPill
-                                label="Barber"
-                                value={tenant.numberOfBarberServices}
-                                icon={<Scissors className="h-4 w-4" />}
-                            />
-                            <StatPill
-                                label="Service Girl"
-                                value={tenant.numberOfServiceGirlServices}
-                                icon={<Scissors className="h-4 w-4" />}
-                            />
-                        </div>
-                    </div>
-                </div>
+
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-primary mb-2">My Shop</h1>
+                <p className="text-gray-500">Manage your barbershop settings and configurations</p>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-3">
-                {/* Main Content */}
-                <div className="space-y-6 lg:col-span-2">
-                    {/* Shop Overview */}
-                    <section className="rounded-xl border bg-card p-6">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-semibold">Shop Information</h2>
-                            <Button variant="outline" size="sm" className="gap-2">
-                                <Edit className="h-4 w-4" />
-                                Edit
-                            </Button>
-                        </div>
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <InfoRow icon={<Mail className="h-4 w-4" />} label="Email" value={tenant.email} />
-                            <InfoRow icon={<Phone className="h-4 w-4" />} label="Phone" value={tenant.phoneNumber} />
-                            <InfoRow
-                                icon={<CreditCard className="h-4 w-4" />}
-                                label="M-Pesa Till"
-                                value={tenant.mpesaTillNo || "Not set"}
-                            />
-                            <InfoRow
-                                icon={<CreditCard className="h-4 w-4" />}
-                                label="Business Short Code"
-                                value={tenant.mpesaBusinessShortCode || "Not set"}
-                            />
-                            <InfoRow icon={<Calendar className="h-4 w-4" />} label="Created" value={formatDate(tenant.createdAt)} />
-                            <InfoRow
-                                icon={<Calendar className="h-4 w-4" />}
-                                label="Last Updated"
-                                value={formatDate(tenant.updatedAt)}
-                            />
-                        </div>
-                    </section>
-
-                    {/* Staff List */}
-                    <section className="rounded-xl border bg-card p-6">
-                        <div className="mb-4 flex items-center justify-between">
-                            <h2 className="text-lg font-semibold">Staff Members</h2>
-                            <div className="flex items-center gap-2">
-                                <Badge variant="secondary">{tenant.users?.totalUsers ?? 0} members</Badge>
-                                <Button size="sm" onClick={() => navigate("/dashboard/staff")}>
-                                    Manage Staff
-                                </Button>
-                            </div>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Email</TableHead>
-                                        <TableHead>Phone</TableHead>
-                                        <TableHead>Role</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {tenant.users?.data?.length ? (
-                                        tenant.users.data.map((staffMember) => (
-                                            <TableRow key={staffMember.userId}>
-                                                <TableCell>{staffMember.email}</TableCell>
-                                                <TableCell>{staffMember.phoneNumber || "—"}</TableCell>
-                                                <TableCell>
-                                                    <Badge variant="outline">{staffMember.role}</Badge>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                    ) : (
-                                        <TableRow>
-                                            <TableCell colSpan={3} className="h-20 text-center text-muted-foreground">
-                                                No staff members yet.
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </div>
-
-                        {/* Pagination Controls */}
-                        {tenant.users && tenant.users.totalPages > 1 && (
-                            <div className="mt-4 flex items-center justify-between border-t pt-4">
-                                <div className="text-sm text-muted-foreground">
-                                    Showing {((tenant.users.currentPage - 1) * tenant.users.pageSize) + 1} to{" "}
-                                    {Math.min(tenant.users.currentPage * tenant.users.pageSize, tenant.users.totalUsers)} of{" "}
-                                    {tenant.users.totalUsers} staff members
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => setUserPage(p => Math.max(1, p - 1))}
-                                        disabled={tenant.users.currentPage === 1}
-                                    >
-                                        <ChevronLeft className="h-4 w-4 mr-1" />
-                                        Previous
-                                    </Button>
-                                    <div className="text-sm">
-                                        Page {tenant.users.currentPage} of {tenant.users.totalPages}
-                                    </div>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => setUserPage(p => Math.min(tenant.users.totalPages, p + 1))}
-                                        disabled={tenant.users.currentPage === tenant.users.totalPages}
-                                    >
-                                        Next
-                                        <ChevronRight className="h-4 w-4 ml-1" />
-                                    </Button>
-                                </div>
-                            </div>
-                        )}
-                    </section>
-
-                    {/* Services Section */}
-                    <section className="rounded-xl border bg-card p-6">
-                        <div className="mb-4 flex items-center justify-between">
-                            <h2 className="text-lg font-semibold">Services</h2>
-                            <Button size="sm" onClick={() => navigate("/dashboard/services")}>
-                                Manage Services
-                            </Button>
-                        </div>
-                        {groupedServices.length ? (
-                            <div className="space-y-6">
-                                {groupedServices.map((group) => (
-                                    <div key={group.type} className="rounded-lg border bg-muted/30 p-4">
-                                        <div className="mb-3 flex items-center justify-between">
-                                            <div className="flex items-center gap-2">
-                                                <Shield className="h-4 w-4 text-primary" />
-                                                <h3 className="font-semibold text-sm uppercase tracking-wide">{group.type}</h3>
-                                            </div>
-                                            <Badge variant="outline">{group.services.length} services</Badge>
-                                        </div>
-                                        <div className="space-y-3">
-                                            {group.services.map((service) => (
-                                                <div
-                                                    key={service.serviceId}
-                                                    className="flex items-center justify-between rounded-md border bg-card/80 px-3 py-2"
-                                                >
-                                                    <div>
-                                                        <p className="font-medium">{service.serviceName}</p>
-                                                        <p className="text-xs text-muted-foreground">ID: {service.serviceId}</p>
-                                                    </div>
-                                                    <span className="text-sm font-semibold">KES {service.servicePrice}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-8">
-                                <p className="text-sm text-muted-foreground mb-4">No services have been added yet.</p>
-                                <Button variant="outline" onClick={() => navigate("/dashboard/services")}>
-                                    Add Your First Service
-                                </Button>
-                            </div>
-                        )}
-                    </section>
-                </div>
-
-                {/* Sidebar */}
-                <div className="space-y-6">
-                    {/* About Section */}
-                    <section className="rounded-xl border bg-card p-6">
-                        <h2 className="mb-4 text-lg font-semibold">About Your Shop</h2>
-                        <div className="space-y-4 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-3">
-                                <MapPin className="h-4 w-4" />
-                                <span>{tenant.subdomain}.foliocuts.com</span>
-                            </div>
-                            <p>
-                                Your shop <strong>{tenant.businessName}</strong> operates on the{" "}
-                                <strong>{tenant.subscriptionPlan}</strong> plan and is {tenant.status.toLowerCase()}.
-                            </p>
-                        </div>
-                    </section>
-
-                    {/* Quick Actions */}
-                    <section className="rounded-xl border bg-card p-6">
-                        <h2 className="mb-4 text-lg font-semibold">Quick Actions</h2>
-                        <div className="space-y-3">
-                            <Button className="w-full" variant="default" onClick={() => navigate("/dashboard/staff")}>
-                                <Users className="mr-2 h-4 w-4" />
-                                Manage Staff
-                            </Button>
-                            <Button className="w-full" variant="outline" onClick={() => navigate("/dashboard/services")}>
-                                <Scissors className="mr-2 h-4 w-4" />
-                                Manage Services
-                            </Button>
-                            <Button className="w-full" variant="outline" onClick={() => navigate("/dashboard/records")}>
-                                <CreditCard className="mr-2 h-4 w-4" />
-                                View Records
-                            </Button>
-                            <Button className="w-full" variant="outline" onClick={() => navigate("/dashboard/service-types")}>
-                                <Shield className="mr-2 h-4 w-4" />
-                                Service Types
-                            </Button>
-                        </div>
-                    </section>
-
-                    {/* Subscription Info */}
-                    <section className="rounded-xl border bg-card p-6">
-                        <h2 className="mb-4 text-lg font-semibold">Subscription</h2>
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-muted-foreground">Current Plan</span>
-                                <Badge variant="secondary">{tenant.subscriptionPlan}</Badge>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-muted-foreground">Status</span>
-                                <Badge variant={tenant.status === "ACTIVE" ? "default" : "secondary"}>
-                                    {tenant.status}
-                                </Badge>
-                            </div>
-                            <Button className="w-full mt-4" variant="outline">
-                                Upgrade Plan
-                            </Button>
-                        </div>
-                    </section>
-                </div>
+            {/* Tabs */}
+            <div className="flex gap-2 border-b border-gray-200 mb-8 overflow-x-auto">
+                {tabs.map((tab) => {
+                    const Icon = tab.icon;
+                    return (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors whitespace-nowrap ${
+                                activeTab === tab.id
+                                    ? 'border-accent text-accent'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                            }`}
+                        >
+                            <Icon className="w-4 h-4" />
+                            <span className="text-sm">{tab.label}</span>
+                        </button>
+                    );
+                })}
             </div>
-        </div>
-    );
-}
 
-function StatPill({
-    label,
-    value,
-    icon,
-}: {
-    label: string;
-    value: string | number | undefined;
-    icon: React.ReactNode;
-}) {
-    return (
-        <div className="rounded-2xl bg-primary-foreground/15 px-4 py-3 text-center text-primary-foreground">
-            <div className="mb-1 flex items-center justify-center gap-2 text-xs uppercase tracking-wide">
-                {icon}
-                {label}
-            </div>
-            <div className="text-2xl font-semibold">{value ?? "0"}</div>
-        </div>
-    );
-}
-
-function InfoRow({
-    icon,
-    label,
-    value,
-}: {
-    icon: React.ReactNode;
-    label: string;
-    value: string | undefined;
-}) {
-    return (
-        <div className="flex items-center gap-3 rounded-lg border bg-muted/30 px-3 py-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-                {icon}
-            </div>
+            {/* Tab Content */}
             <div>
-                <p className="text-xs text-muted-foreground">{label}</p>
-                <p className="font-medium text-card-foreground">{value || "—"}</p>
+                {activeTab === 'profile' && tenant && <ShopProfile tenant={tenant} />}
+                {activeTab === 'services' && tenant && <ServicesManagement tenant={tenant} />}
+                {activeTab === 'commission' && tenant && <CommissionSettings tenant={tenant} />}
+                {activeTab === 'loyalty' && <LoyaltySettings />}
+                {activeTab === 'subscription' && tenant && <SubscriptionCard tenant={tenant} />}
             </div>
         </div>
     );

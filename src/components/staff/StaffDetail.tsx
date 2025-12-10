@@ -1,6 +1,12 @@
 import { ArrowLeft, Edit2, Trash2, Phone, Mail, Calendar, Scissors, TrendingUp, DollarSign } from 'lucide-react';
 import type { User } from '@/types/user';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  useEmployeePerformanceOverview,
+  useEmployeeWeeklyPerformance,
+  useEmployeeServices,
+  useRecentActivities
+} from '@/hooks/userUser';
 
 interface StaffDetailProps {
   staff: User;
@@ -9,61 +15,56 @@ interface StaffDetailProps {
   onDelete: () => void;
 }
 
-// TODO: API NEEDED - GET /api/staff/:id/performance
-// Should return detailed performance data for the staff member including:
-// - Weekly performance chart data
-// - Today/Week/Month statistics
-// - Assigned services and commission rates
-// - Recent activity/services
-
 export function StaffDetail({ staff, onBack, onEdit, onDelete }: StaffDetailProps) {
-  // TODO: Fetch from API
-  const weeklyData = [
-    { day: 'Mon', services: 8, revenue: 4000, commission: 1200 },
-    { day: 'Tue', services: 10, revenue: 5000, commission: 1500 },
-    { day: 'Wed', services: 7, revenue: 3500, commission: 1050 },
-    { day: 'Thu', services: 11, revenue: 5500, commission: 1650 },
-    { day: 'Fri', services: 12, revenue: 6000, commission: 1800 },
-    { day: 'Sat', services: 15, revenue: 7500, commission: 2250 },
-    { day: 'Sun', services: 9, revenue: 4500, commission: 1350 },
-  ];
+  // Fetch performance data
+  const { data: performanceOverview } = useEmployeePerformanceOverview(staff.id);
+  const { data: weeklyPerformanceData } = useEmployeeWeeklyPerformance(staff.id);
+  const { data: servicesData } = useEmployeeServices(staff.id);
+  const { data: recentActivitiesData } = useRecentActivities(staff.id, 5);
 
-  // Mock stats - should come from API
+  // Transform weekly data for chart
+  const weeklyData = weeklyPerformanceData?.data?.data?.map(day => ({
+    day: day.day,
+    services: day.services,
+    revenue: Number(day.revenue) || 0,
+    commission: Number(day.commission) || 0,
+  })) || [];
+
+  // Stats from performance overview
   const stats = {
     today: {
-      services: 12,
-      revenue: 6000,
-      commission: 1800,
+      services: performanceOverview?.data?.todaysPerformance?.services || 0,
+      revenue: Number(performanceOverview?.data?.todaysPerformance?.revenue) || 0,
+      commission: Number(performanceOverview?.data?.todaysPerformance?.commission) || 0,
     },
     week: {
-      services: 68,
-      revenue: 34000,
-      commission: 10200,
+      services: performanceOverview?.data?.weeklyPerformance?.services || 0,
+      revenue: Number(performanceOverview?.data?.weeklyPerformance?.revenue) || 0,
+      commission: Number(performanceOverview?.data?.weeklyPerformance?.commission) || 0,
     },
     month: {
-      services: 285,
-      revenue: 142500,
-      commission: 42750,
+      services: performanceOverview?.data?.monthlyPerformance?.services || 0,
+      revenue: Number(performanceOverview?.data?.monthlyPerformance?.revenue) || 0,
+      commission: Number(performanceOverview?.data?.monthlyPerformance?.commission) || 0,
     },
   };
 
-  // Mock services - should come from API
-  const assignedServices = ['Regular Haircut', 'Premium Haircut', 'Beard Trim', 'Beard Shaping'];
-  const commissionRates = [
-    { service: 'Regular Haircut', rate: 30 },
-    { service: 'Premium Haircut', rate: 35 },
-    { service: 'Beard Trim', rate: 30 },
-    { service: 'Beard Shaping', rate: 30 },
-  ];
+  // Services and commission rates from API
+  const assignedServices = servicesData?.data?.assignedServices || [];
+  const commissionRates = servicesData?.data?.commissionRates || [];
 
-  // Mock recent activity - should come from API
-  const recentActivity = [
-    { customer: '0722123456', service: 'Regular Haircut', amount: 300, time: '10:30 AM', commission: 90 },
-    { customer: '0733987654', service: 'Beard Trim', amount: 200, time: '11:15 AM', commission: 60 },
-    { customer: '0711234567', service: 'Premium Haircut', amount: 500, time: '12:00 PM', commission: 175 },
-    { customer: '0798765432', service: 'Regular Haircut', amount: 300, time: '01:20 PM', commission: 90 },
-    { customer: '0755123456', service: 'Beard Shaping', amount: 250, time: '02:45 PM', commission: 75 },
-  ];
+  // Recent activities from API
+  const recentActivity = recentActivitiesData?.data?.map(activity => ({
+    customer: activity.customerNumber,
+    service: activity.serviceName,
+    amount: Number(activity.amount) || 0,
+    time: new Date(activity.createdAt).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    }),
+    commission: Number(activity.commission) || 0,
+  })) || [];
 
   const getInitials = (fullName: string | null | undefined) => {
     if (!fullName) return 'U';
@@ -272,18 +273,18 @@ export function StaffDetail({ staff, onBack, onEdit, onDelete }: StaffDetailProp
         <div className="bg-card rounded-xl p-6 border border-border">
           <h3 className="text-xl font-bold text-foreground mb-4">Assigned Services</h3>
           <div className="space-y-2">
-            {assignedServices.map((service, index) => (
-              <div key={index} className="flex items-center justify-between p-3 border border-border rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Scissors className="w-4 h-4 text-accent" />
-                  <p className="text-sm font-semibold text-foreground">{service}</p>
+            {assignedServices.length > 0 ? (
+              assignedServices.map((service, index) => (
+                <div key={index} className="flex items-center justify-between p-3 border border-border rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Scissors className="w-4 h-4 text-accent" />
+                    <p className="text-sm font-semibold text-foreground">{service}</p>
+                  </div>
                 </div>
-                <button className="text-xs text-destructive hover:underline">Remove</button>
-              </div>
-            ))}
-            <button className="w-full p-3 border-2 border-dashed border-border rounded-lg text-sm text-muted-foreground hover:border-accent hover:text-accent transition-colors">
-              + Add Service
-            </button>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">No services assigned yet</p>
+            )}
           </div>
         </div>
 
@@ -291,17 +292,18 @@ export function StaffDetail({ staff, onBack, onEdit, onDelete }: StaffDetailProp
         <div className="bg-card rounded-xl p-6 border border-border">
           <h3 className="text-xl font-bold text-foreground mb-4">Commission Rates</h3>
           <div className="space-y-3">
-            {commissionRates.map((item, index) => (
-              <div key={index} className="flex items-center justify-between p-3 border border-border rounded-lg">
-                <p className="text-sm font-semibold text-foreground">{item.service}</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-accent">{item.rate}%</span>
-                  <button className="p-1 hover:bg-accent/10 rounded transition-colors">
-                    <Edit2 className="w-3 h-3 text-muted-foreground" />
-                  </button>
+            {commissionRates.length > 0 ? (
+              commissionRates.map((item, index) => (
+                <div key={index} className="flex items-center justify-between p-3 border border-border rounded-lg">
+                  <p className="text-sm font-semibold text-foreground">{item.service}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-accent">{Number(item.rate) || 0}%</span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">No commission rates configured</p>
+            )}
           </div>
         </div>
       </div>
@@ -310,21 +312,25 @@ export function StaffDetail({ staff, onBack, onEdit, onDelete }: StaffDetailProp
       <div className="bg-card rounded-xl p-6 border border-border">
         <h3 className="text-xl font-bold text-foreground mb-4">Recent Services</h3>
         <div className="space-y-3">
-          {recentActivity.map((activity, index) => (
-            <div key={index} className="flex items-center justify-between p-4 border border-border rounded-lg hover:border-accent transition-colors">
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-foreground mb-1">{activity.service}</p>
-                <p className="text-xs text-muted-foreground">Customer: {activity.customer}</p>
+          {recentActivity.length > 0 ? (
+            recentActivity.map((activity, index) => (
+              <div key={index} className="flex items-center justify-between p-4 border border-border rounded-lg hover:border-accent transition-colors">
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-foreground mb-1">{activity.service}</p>
+                  <p className="text-xs text-muted-foreground">Customer: {activity.customer}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-semibold text-foreground">KES {activity.amount.toLocaleString()}</p>
+                  <p className="text-xs text-accent">+KES {activity.commission.toLocaleString()} commission</p>
+                </div>
+                <div className="ml-4 text-right">
+                  <p className="text-xs text-muted-foreground">{activity.time}</p>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-sm font-semibold text-foreground">KES {activity.amount}</p>
-                <p className="text-xs text-accent">+KES {activity.commission} commission</p>
-              </div>
-              <div className="ml-4 text-right">
-                <p className="text-xs text-muted-foreground">{activity.time}</p>
-              </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-4">No recent activity</p>
+          )}
         </div>
       </div>
     </div>
