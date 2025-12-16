@@ -16,11 +16,3 @@ export const useCustomer = (customerId: number) => {
         enabled: !!customerId,
     })
 }
-
-export const useCustomerByPhone = (phone: string) => {
-    return useQuery({
-        queryKey: ['customer-by-phone', phone],
-        queryFn: () => customerService.getCustomerByPhone(phone),
-        enabled: !!phone,
-    })
-}

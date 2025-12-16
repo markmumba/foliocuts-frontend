@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router";
 import { useRecord } from "@/hooks/useRecord";
 import { Spinner } from "@/components/ui/spinner";
@@ -38,11 +39,14 @@ import {
 import type { ServiceItem } from "@/types/record";
 import { formatCurrency, formatDateTime } from "@/utils/utilities";
 import { buildRecordReceiptHtml } from "@/utils/recordReceipt";
+import { customerService } from "@/services/customerService";
+import { toast } from "sonner";
 
 export default function SingleRecord() {
     const { recordId } = useParams();
     const navigate = useNavigate();
     const id = Number(recordId);
+    const [isLoadingCustomer, setIsLoadingCustomer] = useState(false);
 
     const invalidId = !recordId || Number.isNaN(id) || id <= 0;
 
@@ -99,7 +103,30 @@ export default function SingleRecord() {
         URL.revokeObjectURL(url);
     };
 
+    const handleViewCustomerProfile = async () => {
+        if (!record?.customerPhoneNumber) {
+            toast.error("No customer phone number available");
+            return;
+        }
 
+        setIsLoadingCustomer(true);
+        try {
+            const customerData = await customerService.getCustomerByPhone(record.customerPhoneNumber);
+            console.log(customerData);
+            const id = customerData.data;
+
+            if (id) {
+                navigate(`/dashboard/customers/${id}`);
+            } else {
+                toast.error("Customer profile not found");
+            }
+        } catch (error) {
+            console.error("Error fetching customer:", error);
+            toast.error("Failed to load customer profile. Please try again.");
+        } finally {
+            setIsLoadingCustomer(false);
+        }
+    }
 
     if (invalidId) {
         return (
@@ -391,13 +418,14 @@ export default function SingleRecord() {
                             <Button
                                 className="w-full justify-start"
                                 variant="outline"
-                                onClick={() => navigate(`/dashboard/customers?phone=${record.customerPhoneNumber}`)}
+                                onClick={handleViewCustomerProfile}
+                                disabled={isLoadingCustomer || !record?.customerPhoneNumber}
                             >
                                 <User className="w-4 h-4 mr-2" />
-                                View Customer Profile
+                                {isLoadingCustomer ? "Loading..." : "View Customer Profile"}
                             </Button>
-                           
-                    
+
+
                             <Button
                                 className="w-full justify-start"
                                 variant="default"
