@@ -1,6 +1,6 @@
 import { ChevronRight } from 'lucide-react';
 import type { User } from '@/types/user';
-import { useEmployeePerformanceOverview } from '@/hooks/userUser';
+import { useEmployeeDailyPerformance } from '@/hooks/userUser';
 
 interface StaffCardProps {
   member: User;
@@ -9,8 +9,8 @@ interface StaffCardProps {
 }
 
 export function StaffCard({ member, onSelectStaff, isActive = true }: StaffCardProps) {
-  const { data: performanceOverview } = useEmployeePerformanceOverview(member.id);
-  console.log(performanceOverview);
+  const { data: dailyPerformance } = useEmployeeDailyPerformance(member.id);
+  console.log(dailyPerformance);
 
   // Helper to get initials from name
   const getInitials = (fullName: string | null | undefined) => {
@@ -21,7 +21,7 @@ export function StaffCard({ member, onSelectStaff, isActive = true }: StaffCardP
   };
 
   const initials = getInitials(member.fullName);
-  const todaysPerformance = performanceOverview?.data?.todaysPerformance;
+  const todaysPerformance = dailyPerformance?.data;
 
   if (!isActive) {
     // Inactive staff card (simplified, no performance data)
@@ -80,35 +80,55 @@ export function StaffCard({ member, onSelectStaff, isActive = true }: StaffCardP
         {/* Performance Data */}
         {todaysPerformance && (
           <div className="pt-3 mt-3 border-t border-border">
-            <p className="text-xs font-semibold text-muted-foreground mb-2">Today's Performance</p>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="space-y-3 mb-4">
               {todaysPerformance.services !== undefined && (
-                <div>
-                  <p className="text-xs text-muted-foreground">Services</p>
-                  <p className="text-sm font-semibold text-foreground">{todaysPerformance.services}</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">Today</p>
+                  <p className="text-sm font-semibold text-foreground">{todaysPerformance.services} services</p>
                 </div>
               )}
               {todaysPerformance.revenue !== undefined && (
-                <div>
-                  <p className="text-xs text-muted-foreground">Revenue</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">Revenue</p>
                   <p className="text-sm font-semibold text-foreground">
                     {typeof todaysPerformance.revenue === 'number'
-                      ? `${todaysPerformance.revenue.toLocaleString()}`
+                      ? `KES ${todaysPerformance.revenue.toLocaleString()}`
                       : todaysPerformance.revenue}
                   </p>
                 </div>
               )}
               {todaysPerformance.commission !== undefined && (
-                <div>
-                  <p className="text-xs text-muted-foreground">Commission</p>
-                  <p className="text-sm font-semibold text-foreground">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">Commission</p>
+                  <p className="text-sm font-semibold text-accent">
                     {typeof todaysPerformance.commission === 'number'
-                      ? `${todaysPerformance.commission.toLocaleString()}`
+                      ? `KES ${todaysPerformance.commission.toLocaleString()}`
                       : todaysPerformance.commission}
                   </p>
                 </div>
               )}
             </div>
+
+            {/* Services performed / specialty list */}
+            {Array.isArray(todaysPerformance.servicesPerformed) && todaysPerformance.servicesPerformed.length > 0 ? (
+              <div className="mt-3">
+                <p className="text-xs font-semibold text-muted-foreground mb-1">Services performed today</p>
+                <div className="flex flex-wrap gap-1">
+                  {todaysPerformance.servicesPerformed.map((service, index) => (
+                    <span
+                      key={`${service}-${index}`}
+                      className="text-[11px] px-2 py-1 rounded-full bg-muted text-muted-foreground"
+                    >
+                      {service}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="mt-3 text-[11px] text-muted-foreground">
+                No services recorded yet today.
+              </p>
+            )}
           </div>
         )}
 

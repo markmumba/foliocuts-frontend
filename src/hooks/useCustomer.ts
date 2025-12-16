@@ -13,5 +13,14 @@ export const useCustomer = (customerId: number) => {
     return useQuery({
         queryKey: ['customer', customerId],
         queryFn: () => customerService.getCustomer(customerId),
+        enabled: !!customerId,
+    })
+}
+
+export const useCustomerByPhone = (phone: string) => {
+    return useQuery({
+        queryKey: ['customer-by-phone', phone],
+        queryFn: () => customerService.getCustomerByPhone(phone),
+        enabled: !!phone,
     })
 }

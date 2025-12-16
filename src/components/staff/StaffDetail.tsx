@@ -155,8 +155,8 @@ export function StaffDetail({ staff, onBack, onEdit, onDelete }: StaffDetailProp
             <div>
               <p className="text-sm text-muted-foreground mb-1">Status</p>
               <span className={`px-3 py-1 rounded-full text-sm font-semibold ${staff.status?.toUpperCase() === 'ACTIVE'
-                  ? 'bg-accent/10 text-accent'
-                  : 'bg-muted text-muted-foreground'
+                ? 'bg-accent/10 text-accent'
+                : 'bg-muted text-muted-foreground'
                 }`}>
                 {staff.status || 'Unknown'}
               </span>
@@ -249,11 +249,21 @@ export function StaffDetail({ staff, onBack, onEdit, onDelete }: StaffDetailProp
               tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
             />
             <Tooltip
+              cursor={{ fill: 'rgba(148, 163, 184, 0.25)' }} // soft grey highlight
               contentStyle={{
-                backgroundColor: 'hsl(var(--card))',
-                border: '1px solid hsl(var(--border))',
+                backgroundColor: '#111827', // dark background similar to reference
+                border: '1px solid #111827',
                 borderRadius: '8px',
-                color: 'hsl(var(--foreground))'
+                color: '#e5e7eb', // light text
+              }}
+              labelStyle={{
+                color: '#e5e7eb',
+                fontWeight: 600,
+                fontSize: 12,
+              }}
+              itemStyle={{
+                color: '#facc15', // yellow text for values
+                fontSize: 12,
               }}
               formatter={(value, name) => {
                 if (name === 'services') return [value, 'Services'];
@@ -261,8 +271,17 @@ export function StaffDetail({ staff, onBack, onEdit, onDelete }: StaffDetailProp
                 return [value, name];
               }}
             />
-            <Bar dataKey="services" fill="hsl(var(--accent))" radius={[8, 8, 0, 0]} />
-            <Bar dataKey="commission" fill="hsl(var(--secondary))" radius={[8, 8, 0, 0]} />
+            {/* Green services bar, yellow commission bar for clear contrast */}
+            <Bar
+              dataKey="services"
+              fill="#22c55e" // green
+              radius={[8, 8, 0, 0]}
+            />
+            <Bar
+              dataKey="commission"
+              fill="#facc15" // yellow
+              radius={[8, 8, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

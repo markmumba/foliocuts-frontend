@@ -20,8 +20,24 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Phone, ArrowLeft, Scissors, Wallet, Calendar, User, Gift } from "lucide-react";
+import {
+    Phone,
+    ArrowLeft,
+    Scissors,
+    Calendar,
+    User,
+    Gift,
+    Download,
+    Printer,
+    DollarSign,
+    Tag,
+    CheckCircle,
+    XCircle,
+    Clock
+} from "lucide-react";
 import type { ServiceItem } from "@/types/record";
+import { formatCurrency, formatDateTime } from "@/utils/utilities";
+import { buildRecordReceiptHtml } from "@/utils/recordReceipt";
 
 export default function SingleRecord() {
     const { recordId } = useParams();
@@ -33,24 +49,57 @@ export default function SingleRecord() {
     const { data, isLoading, error } = useRecord(invalidId ? 0 : id);
     const record = data?.data;
 
-    const formatCurrency = (amount?: number | string) => {
-        const parsed = Number(amount ?? 0);
-        if (Number.isNaN(parsed)) return "KES 0.00";
-        return `KES ${parsed.toFixed(2)}`;
+
+
+
+    const getStatusColor = (status: string) => {
+        const normalizedStatus = status?.toUpperCase();
+        switch (normalizedStatus) {
+            case 'COMPLETED':
+                return 'bg-primary/10 text-primary border-primary/20';
+            case 'PENDING':
+                return 'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400';
+            case 'CANCELLED':
+                return 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400';
+            default:
+                return 'bg-muted text-muted-foreground border-border';
+        }
     };
 
-    const formatDateTime = (dateString?: string) => {
-        if (!dateString) return "—";
-        const date = new Date(dateString);
-        if (Number.isNaN(date.getTime())) return dateString;
-        return date.toLocaleString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-        });
+    const handlePrint = () => {
+        if (!record) return;
+        const html = buildRecordReceiptHtml(record);
+        if (!html) return;
+
+        const printWindow = window.open("", "_blank", "width=800,height=600");
+        if (!printWindow) return;
+
+        printWindow.document.open();
+        printWindow.document.write(html.replace(
+            "</body>",
+            `<script>window.onload = function() { window.print(); }</script></body>`
+        ));
+        printWindow.document.close();
     };
+
+    const handleDownload = () => {
+        if (!record) return;
+        const html = buildRecordReceiptHtml(record);
+        if (!html) return;
+
+        const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `receipt-${record.recordCode}.html`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+
 
     if (invalidId) {
         return (
@@ -76,88 +125,139 @@ export default function SingleRecord() {
         );
     }
 
+    const dateTime = formatDateTime(record?.createdAt);
+
     return (
-        <div className="min-h-screen bg-background p-6">
-            <Breadcrumb className="mb-4">
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink asChild>
-                            <Link to="/dashboard">Dashboard</Link>
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbLink asChild>
-                            <Link to="/dashboard/records">Records</Link>
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>{record.recordCode}</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
+        <div className="p-8">
+            {/* Header with Back Button */}
+            <div className="mb-8">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4 transition-colors"
+                >
+                    <ArrowLeft className="w-5 h-5" />
+                    Back to Records
+                </button>
 
-            <Button
-                variant="ghost"
-                className="mb-4 gap-2"
-                onClick={() => navigate(-1)}
-            >
-                <ArrowLeft className="h-4 w-4" />
-                Back to records
-            </Button>
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <div>
+                        <Breadcrumb className="mb-4">
+                            <BreadcrumbList>
+                                <BreadcrumbItem>
+                                    <BreadcrumbLink asChild>
+                                        <Link to="/dashboard">Dashboard</Link>
+                                    </BreadcrumbLink>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem>
+                                    <BreadcrumbLink asChild>
+                                        <Link to="/dashboard/records">Records</Link>
+                                    </BreadcrumbLink>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem>
+                                    <BreadcrumbPage>{record.recordCode}</BreadcrumbPage>
+                                </BreadcrumbItem>
+                            </BreadcrumbList>
+                        </Breadcrumb>
+                        <h1 className="text-3xl font-bold text-foreground mb-2">Service Record</h1>
+                        <p className="text-muted-foreground">Complete details for record #{record.recordCode}</p>
+                    </div>
 
-            <div className="overflow-hidden rounded-2xl border bg-linear-to-r from-primary to-primary/70 text-primary-foreground shadow-xl">
-                <div className="p-6 sm:p-10">
-                    <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                        <div className="flex items-start gap-4">
-                            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-foreground/20">
-                                <Scissors className="h-8 w-8" />
-                            </div>
-                            <div>
-                                <div className="mb-2 flex flex-wrap items-center gap-2 text-sm">
-                                    <Badge variant="secondary">{record.status}</Badge>
-                                    <Badge variant="outline">{record.customerPhoneNumber}</Badge>
-                                </div>
-                                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                                    {record.recordCode}
-                                </h1>
-                                <p className="text-sm text-primary-foreground/80">
-                                    {record.customerName}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3">
-                            <StatPill
-                                label="Total Amount"
-                                value={formatCurrency(record.totalAmount)}
-                                icon={<Wallet className="h-4 w-4" />}
-                            />
-                            <StatPill
-                                label="Discount"
-                                value={formatCurrency(record.discountAmount)}
-                                icon={<Wallet className="h-4 w-4" />}
-                            />
-                            <StatPill
-                                label="Final Amount"
-                                value={formatCurrency(record.finalAmount)}
-                                icon={<Wallet className="h-4 w-4" />}
-                            />
-                        </div>
+                    <div className="flex items-center gap-3">
+                     
+                        <button
+                            onClick={handleDownload}
+                            className="px-4 py-2 border border-border rounded-lg hover:bg-muted flex items-center gap-2 transition-colors"
+                        >
+                            <Download className="w-4 h-4" />
+                            Download
+                        </button>
+                        <button
+                            onClick={handlePrint}
+                            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 flex items-center gap-2 transition-colors"
+                        >
+                            <Printer className="w-4 h-4" />
+                            Print Receipt
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <div className="mt-8 grid gap-6 lg:grid-cols-3">
-                <div className="space-y-6 lg:col-span-2">
-                    {/* Service Items */}
-                    <section className="rounded-xl border bg-card p-6">
-                        <div className="mb-4 flex items-center justify-between">
-                            <h2 className="text-lg font-semibold">Service Items</h2>
-                            <Badge variant="secondary">
-                                {record.serviceItems?.length ?? 0} services
-                            </Badge>
+            {/* Status Banner */}
+            <div className={`rounded-xl p-6 mb-8 border ${getStatusColor(record.status)}`}>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        {record.status?.toUpperCase() === 'COMPLETED' ? (
+                            <CheckCircle className="w-8 h-8" />
+                        ) : record.status?.toUpperCase() === 'CANCELLED' ? (
+                            <XCircle className="w-8 h-8" />
+                        ) : (
+                            <Clock className="w-8 h-8" />
+                        )}
+                        <div>
+                            <h3 className="text-lg font-semibold capitalize mb-1">{record.status?.toLowerCase() || 'unknown'}</h3>
+                            <p className="text-sm opacity-80">
+                                {record.status?.toUpperCase() === 'COMPLETED'
+                                    ? 'This service has been completed successfully'
+                                    : record.status?.toUpperCase() === 'PENDING'
+                                        ? 'Payment confirmation pending'
+                                        : 'This service was cancelled'}
+                            </p>
                         </div>
+                    </div>
+                    <Badge className="px-4 py-2 text-sm">{record.status}</Badge>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Main Content - 2 columns */}
+                <div className="lg:col-span-2 space-y-6">
+                    {/* Customer Information */}
+                    <div className="bg-card rounded-xl p-6 border border-border">
+                        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-6">
+                            <User className="w-5 h-5" />
+                            Customer Information
+                        </h2>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-sm text-muted-foreground block mb-1">Customer Name</label>
+                                    <p className="text-foreground font-medium">{record.customerName || 'Guest Customer'}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm text-muted-foreground block mb-1">Phone Number</label>
+                                    <p className="text-foreground font-medium flex items-center gap-2">
+                                        <Phone className="w-4 h-4 text-muted-foreground" />
+                                        {record.customerPhoneNumber}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-sm text-muted-foreground block mb-1">Record ID</label>
+                                    <p className="text-foreground font-medium font-mono text-sm">{record.recordCode}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm text-muted-foreground block mb-1">Created</label>
+                                    <p className="text-foreground font-medium flex items-center gap-2">
+                                        <Calendar className="w-4 h-4 text-muted-foreground" />
+                                        {dateTime.date}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Service Items */}
+                    <div className="bg-card rounded-xl p-6 border border-border">
+                        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-6">
+                            <Scissors className="w-5 h-5" />
+                            Service Details
+                        </h2>
+
                         <div className="overflow-x-auto">
                             <Table>
                                 <TableHeader>
@@ -219,133 +319,96 @@ export default function SingleRecord() {
                                 </TableBody>
                             </Table>
                         </div>
-                    </section>
+                    </div>
 
-                    {/* Record Details */}
-                    <section className="rounded-xl border bg-card p-6">
-                        <h2 className="mb-4 text-lg font-semibold">Record Information</h2>
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <InfoRow
-                                icon={<Phone className="h-4 w-4" />}
-                                label="Customer Phone"
-                                value={record.customerPhoneNumber}
-                            />
-                            <InfoRow
-                                icon={<User className="h-4 w-4" />}
-                                label="Customer"
-                                value={record.customerName}
-                            />
-                            <InfoRow
-                                icon={<Calendar className="h-4 w-4" />}
-                                label="Created"
-                                value={formatDateTime(record.createdAt)}
-                            />
-                            <InfoRow
-                                icon={<Calendar className="h-4 w-4" />}
-                                label="Last Updated"
-                                value={formatDateTime(record.updatedAt)}
-                            />
+                    {/* Additional Notes */}
+                    {record.message && (
+                        <div className="bg-card rounded-xl p-6 border border-border">
+                            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-4">
+                                <Tag className="w-5 h-5" />
+                                Additional Notes
+                            </h2>
+                            <p className="text-muted-foreground leading-relaxed">{record.message}</p>
                         </div>
-                        {record.message && (
-                            <div className="mt-4 rounded-lg border bg-muted/40 p-3">
-                                <p className="text-sm text-muted-foreground">
-                                    <strong>Message:</strong> {record.message}
-                                </p>
-                            </div>
-                        )}
-                    </section>
+                    )}
                 </div>
 
+                {/* Sidebar - 1 column */}
                 <div className="space-y-6">
-                    {/* Payment Summary */}
-                    <section className="rounded-xl border bg-card p-6">
-                        <h2 className="mb-4 text-lg font-semibold">Payment Summary</h2>
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between pb-2">
-                                <span className="text-sm text-muted-foreground">Subtotal</span>
-                                <span className="font-medium">{formatCurrency(record.totalAmount)}</span>
+                    {/* Financial Summary */}
+                    <div className="bg-card rounded-xl p-6 border border-border">
+                        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-6">
+                            <DollarSign className="w-5 h-5" />
+                            Financial Summary
+                        </h2>
+
+                        <div className="space-y-4">
+                            <div className="pb-4 border-b border-border">
+                                <label className="text-sm text-muted-foreground block mb-1">Service Price</label>
+                                <p className="text-2xl font-bold text-foreground">
+                                    {formatCurrency(record.totalAmount)}
+                                </p>
                             </div>
-                            <div className="flex items-center justify-between pb-2">
-                                <span className="text-sm text-muted-foreground">Discount</span>
-                                <span className="font-medium text-green-600">
+
+                            <div className="pb-4 border-b border-border">
+                                <label className="text-sm text-muted-foreground block mb-1">Discount</label>
+                                <p className="text-xl font-semibold text-green-600">
                                     -{formatCurrency(record.discountAmount)}
-                                </span>
+                                </p>
                             </div>
-                            <div className="flex items-center justify-between border-t pt-3">
-                                <span className="text-base font-semibold">Total</span>
-                                <span className="text-lg font-bold text-primary">
-                                    {formatCurrency(record.finalAmount)}
-                                </span>
+
+                            <div>
+                                <label className="text-sm text-muted-foreground block mb-1">Final Amount</label>
+                                <p className="text-xl font-bold text-primary">{formatCurrency(record.finalAmount)}</p>
+                                <p className="text-xs text-muted-foreground mt-1">After discount</p>
                             </div>
                         </div>
-                    </section>
+                    </div>
 
-                    {/* Quick Actions */}
-                    <section className="rounded-xl border bg-card p-6">
-                        <h2 className="mb-4 text-lg font-semibold">Quick Actions</h2>
+                    {/* Quick Stats */}
+                    <div className="bg-linear-to-br from-primary to-primary/80 rounded-xl p-6 text-primary-foreground">
+                        <h3 className="text-lg font-semibold mb-4">Record Statistics</h3>
                         <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm opacity-90">Status</span>
+                                <span className="text-sm font-medium">{record.status}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm opacity-90">Services</span>
+                                <span className="text-sm font-medium">{record.serviceItems?.length || 0}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm opacity-90">Created</span>
+                                <span className="text-sm font-medium">{dateTime.date}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="bg-card rounded-xl p-6 border border-border">
+                        <h3 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h3>
+                        <div className="space-y-2">
                             <Button
-                                className="w-full"
-                                variant="default"
+                                className="w-full justify-start"
+                                variant="outline"
                                 onClick={() => navigate(`/dashboard/customers?phone=${record.customerPhoneNumber}`)}
                             >
+                                <User className="w-4 h-4 mr-2" />
                                 View Customer Profile
                             </Button>
-                            <Button className="w-full" variant="outline">
-                                Export Receipt
-                            </Button>
+                           
+                    
                             <Button
-                                className="w-full"
-                                variant="outline"
+                                className="w-full justify-start"
+                                variant="default"
                                 onClick={() => navigate("/dashboard/records/create")}
                             >
+                                <Scissors className="w-4 h-4 mr-2" />
                                 Create New Record
                             </Button>
                         </div>
-                    </section>
+                    </div>
                 </div>
-            </div>
-        </div>
-    );
-}
-
-function StatPill({
-    label,
-    value,
-    icon,
-}: {
-    label: string;
-    value: string;
-    icon: React.ReactNode;
-}) {
-    return (
-        <div className="rounded-2xl bg-primary-foreground/15 px-4 py-3 text-center text-primary-foreground">
-            <div className="mb-1 flex items-center justify-center gap-2 text-xs uppercase tracking-wide">
-                {icon}
-                {label}
-            </div>
-            <div className="text-2xl font-semibold">{value}</div>
-        </div>
-    );
-}
-
-function InfoRow({
-    icon,
-    label,
-    value,
-}: {
-    icon: React.ReactNode;
-    label: string;
-    value: string;
-}) {
-    return (
-        <div className="flex items-center gap-3 rounded-lg border bg-muted/30 px-3 py-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-                {icon}
-            </div>
-            <div>
-                <p className="text-xs text-muted-foreground">{label}</p>
-                <p className="font-medium text-card-foreground">{value || "—"}</p>
             </div>
         </div>
     );

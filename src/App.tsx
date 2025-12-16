@@ -36,20 +36,20 @@ import SingleCustomer from './pages/customers/single-customer'
 function App() {
 
   const queryClient = new QueryClient({
-    // defaultOptions: {
-    //   queries: {
-    //     refetchOnWindowFocus: false,
-    //     staleTime: 5 * 60 * 1000,
-    //     retry: (failureCount, error) => {
-    //       const status = (error as unknown as { response?: { status: number } })?.response?.status
-    //       if (status === 401 || status === 403) return false;
-    //       return failureCount < 1;
-    //     },
-    //   },
-    //   mutations: {
-    //     retry: false,
-    //   }
-    // }
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        staleTime: 5 * 60 * 1000,
+        retry: (failureCount, error) => {
+          const status = (error as unknown as { response?: { status: number } })?.response?.status
+          if (status === 401 || status === 403) return false;
+          return failureCount < 1;
+        },
+      },
+      mutations: {
+        retry: false,
+      }
+    }
   })
 
   return (

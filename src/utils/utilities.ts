@@ -53,3 +53,35 @@ export function decodeJWT(token: string): Record<string, unknown> | null {
         return null;
     }
 }
+
+export const formatDateTime = (dateString?: string) => {
+    if (!dateString) return { full: "—", date: "—", time: "—" };
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return { full: dateString, date: dateString, time: "—" };
+
+    return {
+        full: date.toLocaleDateString('en-KE', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }),
+        date: date.toLocaleDateString('en-KE', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        }),
+        time: date.toLocaleTimeString('en-KE', {
+            hour: '2-digit',
+            minute: '2-digit'
+        })
+    };
+};
+
+export const formatCurrency = (amount?: number | string) => {
+    const parsed = Number(amount ?? 0);
+    if (Number.isNaN(parsed)) return "KES 0.00";
+    return `KES ${parsed.toFixed(2)}`;
+};

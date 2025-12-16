@@ -16,5 +16,13 @@ export const customerService = {
     getCustomer: async (customerId: number): Promise<ApiResponse<CustomerResponse>> => {
         const response = await apiClient.get<ApiResponse<CustomerResponse>>(`/customers/${customerId}`);
         return response.data;
-    }
+    },
+    getCustomerByPhone: async (phone: string): Promise<ApiResponse<CustomerResponse>> => {
+        const response = await apiClient.get<ApiResponse<CustomerResponse>>(`/customers/phone`, {
+            params: {
+                phone,
+            },
+        });
+        return response.data;
+    },
 }
