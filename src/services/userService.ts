@@ -70,5 +70,9 @@ export const userService = {
         const response = await apiClient.get<ApiResponse<RecentActivity[]>>(url);
         return response.data;
     },
+    updateEmployeeCommission: async (employeeId: number, serviceId: string, rate: number): Promise<ApiResponse<string>> => {
+        const response = await apiClient.patch<ApiResponse<string>>(`/users/employee/${employeeId}/service/${serviceId}/update-commission`, { rate });
+        return response.data;
+    },
 
 }

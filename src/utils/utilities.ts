@@ -85,3 +85,10 @@ export const formatCurrency = (amount?: number | string) => {
     if (Number.isNaN(parsed)) return "KES 0.00";
     return `KES ${parsed.toFixed(2)}`;
 };
+
+export const getInitials = (fullName: string | null | undefined) => {
+    if (!fullName) return 'U';
+    const names = fullName.split(' ');
+    if (names.length === 1) return names[0].substring(0, 2).toUpperCase();
+    return (names[0][0] + names[1][0]).toUpperCase();
+  };

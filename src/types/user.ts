@@ -1,4 +1,3 @@
-import type { Role } from "./enums";
 
 export interface User {
     id: number;
@@ -14,8 +13,8 @@ export interface User {
 }
 
 export interface CreateStaffRequest {
+    serviceTypeId: string;
     emails: string[];
-    staffRole: Role;
 }
 export interface DeleteStaffResponse {
     totalRequested: number;
@@ -81,6 +80,7 @@ export interface WeeklyPerformance {
 }
 
 export interface ServiceCommissionRate {
+    serviceId?: string;
     service: string;
     rate: string | number;
 }

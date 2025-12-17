@@ -7,6 +7,10 @@ import {
   useEmployeeServices,
   useRecentActivities
 } from '@/hooks/userUser';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { userService } from '@/services/userService';
+import { useNotification } from '@/context/NotificationContext';
+import { useState } from 'react';
 
 interface StaffDetailProps {
   staff: User;
@@ -71,6 +75,44 @@ export function StaffDetail({ staff, onBack, onEdit, onDelete }: StaffDetailProp
     const names = fullName.split(' ');
     if (names.length === 1) return names[0].substring(0, 2).toUpperCase();
     return (names[0][0] + names[1][0]).toUpperCase();
+  };
+
+  // Commission editing state
+  const [editingServiceId, setEditingServiceId] = useState<string | null>(null);
+  const [editingRate, setEditingRate] = useState<string>('');
+
+  const queryClient = useQueryClient();
+  const { success: notifySuccess, error: notifyError } = useNotification();
+
+  const updateCommissionMutation = useMutation({
+    mutationFn: async ({ serviceId, rate }: { serviceId: string; rate: number }) => {
+      return userService.updateEmployeeCommission(staff.id, serviceId, rate);
+    },
+    onSuccess: () => {
+      notifySuccess('Commission rate updated');
+      queryClient.invalidateQueries({ queryKey: ['employee-services', staff.id] });
+      setEditingServiceId(null);
+    },
+    onError: (err: unknown) => {
+      console.error('Failed to update commission rate', err);
+      notifyError('Failed to update commission rate', 'Update error');
+    },
+  });
+
+  const startEditingCommission = (serviceId: string | undefined, currentRate: string | number) => {
+    if (!serviceId) return;
+    setEditingServiceId(serviceId);
+    setEditingRate(String(currentRate ?? '0'));
+  };
+
+  const handleSaveCommission = () => {
+    if (!editingServiceId) return;
+    const parsed = Number(editingRate);
+    if (Number.isNaN(parsed) || parsed < 0) {
+      notifyError('Please enter a valid commission percentage', 'Invalid value');
+      return;
+    }
+    updateCommissionMutation.mutate({ serviceId: editingServiceId, rate: parsed });
   };
 
   return (
@@ -312,16 +354,71 @@ export function StaffDetail({ staff, onBack, onEdit, onDelete }: StaffDetailProp
           <h3 className="text-xl font-bold text-foreground mb-4">Commission Rates</h3>
           <div className="space-y-3">
             {commissionRates.length > 0 ? (
-              commissionRates.map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-3 border border-border rounded-lg">
-                  <p className="text-sm font-semibold text-foreground">{item.service}</p>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-accent">{Number(item.rate) || 0}%</span>
+              commissionRates.map((item, index) => {
+                const serviceId = item.serviceId;
+                const isEditing = serviceId && editingServiceId === serviceId;
+
+                return (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 border border-border rounded-lg"
+                  >
+                    <p className="text-sm font-semibold text-foreground">{item.service}</p>
+                    <div className="flex items-center gap-2">
+                      {isEditing ? (
+                        <>
+                          <input
+                            type="number"
+                            min={0}
+                            step={1}
+                            value={editingRate}
+                            onChange={(e) => setEditingRate(e.target.value)}
+                            className="w-20 px-2 py-1 border border-border rounded-md bg-background text-sm"
+                          />
+                          <span className="text-sm text-muted-foreground">%</span>
+                          <button
+                            type="button"
+                            className="px-3 py-1 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 disabled:opacity-50"
+                            onClick={handleSaveCommission}
+                            disabled={updateCommissionMutation.isPending}
+                          >
+                            Save
+                          </button>
+                          <button
+                            type="button"
+                            className="px-3 py-1 rounded-md border border-border text-xs font-medium hover:bg-muted"
+                            onClick={() => {
+                              setEditingServiceId(null);
+                              setEditingRate('');
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-sm font-semibold text-accent">
+                            {Number(item.rate) || 0}%
+                          </span>
+                          {serviceId && (
+                            <button
+                              type="button"
+                              className="text-xs font-medium text-muted-foreground hover:text-accent underline-offset-2 hover:underline"
+                              onClick={() => startEditingCommission(serviceId, item.rate)}
+                            >
+                              Edit
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             ) : (
-              <p className="text-sm text-muted-foreground text-center py-4">No commission rates configured</p>
+              <p className="text-sm text-muted-foreground text-center py-4">
+                No commission rates configured
+              </p>
             )}
           </div>
         </div>

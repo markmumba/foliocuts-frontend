@@ -45,7 +45,7 @@ export default function CreateStaff() {
     const { success: notifySuccess, error: notifyError } = useNotification();
     const queryClient = useQueryClient();
     const [step, setStep] = useState<1 | 2>(1);
-    const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+    const [selectedRole, setSelectedRole] = useState<string | null>(null);
     const [emails, setEmails] = useState("");
     const [creationResult, setCreationResult] = useState<CreateEmployeesResponse | null>(null);
     const [isResultDialogOpen, setResultDialogOpen] = useState(false);
@@ -126,7 +126,7 @@ export default function CreateStaff() {
 
         const payload: CreateStaffRequest = {
             emails: emailArray,
-            staffRole: selectedRole,
+            serviceTypeId: selectedRole,
         };
 
         createMutation.mutate(payload);

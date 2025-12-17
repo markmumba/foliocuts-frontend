@@ -1,6 +1,7 @@
 import { ChevronRight } from 'lucide-react';
 import type { User } from '@/types/user';
 import { useEmployeeDailyPerformance } from '@/hooks/userUser';
+import { getInitials } from '@/utils/utilities';
 
 interface StaffCardProps {
   member: User;
@@ -10,15 +11,6 @@ interface StaffCardProps {
 
 export function StaffCard({ member, onSelectStaff, isActive = true }: StaffCardProps) {
   const { data: dailyPerformance } = useEmployeeDailyPerformance(member.id);
-  console.log(dailyPerformance);
-
-  // Helper to get initials from name
-  const getInitials = (fullName: string | null | undefined) => {
-    if (!fullName) return 'U';
-    const names = fullName.split(' ');
-    if (names.length === 1) return names[0].substring(0, 2).toUpperCase();
-    return (names[0][0] + names[1][0]).toUpperCase();
-  };
 
   const initials = getInitials(member.fullName);
   const todaysPerformance = dailyPerformance?.data;
