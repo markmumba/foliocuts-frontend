@@ -3,6 +3,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import type { PaymentMethod, PaymentStatus } from "@/types/enums";
 
 export const buildRecordColumns = (
   onViewDetails?: (record: RecordList) => void
@@ -72,6 +73,45 @@ export const buildRecordColumns = (
         <div className="text-foreground font-medium">
           KES {amount.toLocaleString()}
         </div>
+      );
+    },
+  },
+  {
+    header: "Payment Method",
+    accessorKey: "paymentMethod",
+    cell: ({ row }) => {
+      const paymentMethod = row.getValue("paymentMethod") as PaymentMethod;
+      const paymentMethodColors = {
+        CASH: "bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20",
+        MPESA: "bg-brown-500/10 text-brown-700 dark:text-brown-400 border-brown-500/20",
+      };
+      return (
+        <Badge
+          variant="outline"
+          className={paymentMethodColors[paymentMethod as keyof typeof paymentMethodColors] || "bg-muted text-muted-foreground"}
+        >
+          {paymentMethod.toUpperCase()}
+        </Badge>
+      );
+    },
+  },
+  {
+    header: "Payment Status",
+    accessorKey: "paymentStatus",
+    cell: ({ row }) => {
+      const paymentStatus = row.getValue("paymentStatus") as PaymentStatus;
+      const paymentStatusColors = {
+        PENDING: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20",
+        SUCCESS: "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
+        FAILED: "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20",
+      };
+      return (
+        <Badge
+          variant="secondary"
+          className={paymentStatusColors[paymentStatus as keyof typeof paymentStatusColors] || "bg-muted text-muted-foreground"}
+        >
+          {paymentStatus.toUpperCase()}
+        </Badge>
       );
     },
   },

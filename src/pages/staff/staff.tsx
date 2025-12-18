@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { buildStaffColumns } from "./staff-table-definition/column";
 import { StaffDataTable } from "./staff-table-definition/data-table";
-import {  LayoutGrid, Table2, Search, Plus } from "lucide-react";
+import { LayoutGrid, Table2, Search, Plus } from "lucide-react";
 import { Outlet, useLocation, useNavigate, Link } from "react-router";
 import { useCallback, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -128,9 +128,9 @@ export default function Staff() {
         const staff = staffList?.data || [];
         return staff.filter(member => {
             const matchesSearch = member.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                member.role?.toLowerCase().includes(searchQuery.toLowerCase());
+                member.role?.toLowerCase().includes(searchQuery.toLowerCase());
             const matchesFilter = filterRole === 'all' ||
-                                member.role?.toLowerCase().includes(filterRole.toLowerCase());
+                member.role?.toLowerCase().includes(filterRole.toLowerCase());
             return matchesSearch && matchesFilter;
         });
     }, [staffList, searchQuery, filterRole]);
@@ -180,22 +180,20 @@ export default function Staff() {
                             <div className="flex items-center border border-border rounded-lg p-1">
                                 <button
                                     onClick={() => setViewMode('cards')}
-                                    className={`p-2 rounded ${
-                                        viewMode === 'cards'
-                                            ? 'bg-primary text-primary-foreground'
-                                            : 'text-muted-foreground hover:text-foreground'
-                                    } transition-colors`}
+                                    className={`p-2 rounded ${viewMode === 'cards'
+                                        ? 'bg-primary text-primary-foreground'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                        } transition-colors`}
                                     title="Card View"
                                 >
                                     <LayoutGrid className="w-4 h-4" />
                                 </button>
                                 <button
                                     onClick={() => setViewMode('table')}
-                                    className={`p-2 rounded ${
-                                        viewMode === 'table'
-                                            ? 'bg-primary text-primary-foreground'
-                                            : 'text-muted-foreground hover:text-foreground'
-                                    } transition-colors`}
+                                    className={`p-2 rounded ${viewMode === 'table'
+                                        ? 'bg-primary text-primary-foreground'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                        } transition-colors`}
                                     title="Table View"
                                 >
                                     <Table2 className="w-4 h-4" />
@@ -214,50 +212,51 @@ export default function Staff() {
                     </div>
 
                     {/* Search and Filter Bar for Card View */}
-                            {viewMode === 'cards' && (
-                                <div className="flex flex-col sm:flex-row gap-4">
-                                    <div className="relative flex-1">
-                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                                        <input
-                                            type="text"
-                                            placeholder="Search staff by name or role..."
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
-                                            className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent bg-background text-foreground"
-                                        />
-                                    </div>
-
-                                    <select
-                                        value={filterRole}
-                                        onChange={(e) => setFilterRole(e.target.value)}
-                                        className="px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent bg-background text-foreground"
-                                    >
-                                        <option value="all">All Roles</option>
-                                        <option value="barber">Barbers</option>
-                                        <option value="receptionist">Receptionists</option>
-                                        <option value="service">Service Staff</option>
-                                    </select>
-                                </div>
-                            )}
-
-                             {viewMode === 'cards' ? (
-                                <StaffList
-                                    staff={filteredStaff}
-                                    onSelectStaff={setSelectedStaff}
+                    {viewMode === 'cards' && (
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                                <input
+                                    type="text"
+                                    placeholder="Search staff by name or role..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent bg-background text-foreground"
                                 />
-                            ) : (
-                                <div className="-mx-6 rounded-xl">
-                                    <div className="px-6 pt-6">
-                                        <h2 className="text-xl font-semibold mb-4">All Staff Members</h2>
-                                    </div>
-                                    <StaffDataTable
-                                        columns={staffColumns}
-                                        data={staff}
-                                        onDeleteSelected={handleDeleteSelected}
-                                        isDeleting={deleteStaffMutation.isPending}
-                                    />
-                                </div>
-                            )}
+                            </div>
+
+                            <select
+                                value={filterRole}
+                                onChange={(e) => setFilterRole(e.target.value)}
+                                className="px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent bg-background text-foreground"
+                            >
+                                <option value="all">All Roles</option>
+                                <option value="barber">Barbers</option>
+                                <option value="receptionist">Receptionists</option>
+                                <option value="service">Service Staff</option>
+                            </select>
+                        </div>
+                    )}
+
+                    {viewMode === 'cards' ? (
+                        <StaffList
+                            staff={filteredStaff}
+                            onSelectStaff={setSelectedStaff}
+                        />
+                    ) : (
+                        <div className="-mx-6 rounded-xl">
+                            <div className="px-6 pt-6">
+                                <h2 className="text-xl font-semibold mb-4">All Staff Members</h2>
+                            </div>
+                            <StaffDataTable
+                                columns={staffColumns}
+                                data={staff}
+                                onDeleteSelected={handleDeleteSelected}
+                                isDeleting={deleteStaffMutation.isPending}
+                                onRowClick={(row) => setSelectedStaff(row as User)}
+                            />
+                        </div>
+                    )}
 
                     <AlertDialog open={isDeleteResultOpen && !!deleteResult} onOpenChange={(open) => (open ? setDeleteResultOpen(true) : closeDeleteResult())}>
                         <AlertDialogContent>

@@ -15,14 +15,10 @@ import {
 import {
     Store,
     Scissors,
-    DollarSign,
-    Award,
     CreditCard,
 } from "lucide-react";
 import { ShopProfile } from "@/components/shop/ShopProfile";
 import { ServicesManagement } from "@/components/shop/ServicesManagement";
-import { CommissionSettings } from "@/components/shop/CommissionSettings";
-import { LoyaltySettings } from "@/components/shop/LoyaltySettings";
 import { SubscriptionCard } from "@/components/shop/SubscriptionCard";
 
 export default function MyShop() {
@@ -35,8 +31,6 @@ export default function MyShop() {
     const tabs = [
         { id: 'profile', label: 'Shop Profile', icon: Store },
         { id: 'services', label: 'Services & Pricing', icon: Scissors },
-        { id: 'commission', label: 'Commission Rates', icon: DollarSign },
-        { id: 'loyalty', label: 'Loyalty Program', icon: Award },
         { id: 'subscription', label: 'Subscription', icon: CreditCard },
     ];
 
@@ -95,11 +89,10 @@ export default function MyShop() {
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors whitespace-nowrap ${
-                                activeTab === tab.id
+                            className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.id
                                     ? 'border-accent text-accent'
                                     : 'border-transparent text-gray-500 hover:text-gray-700'
-                            }`}
+                                }`}
                         >
                             <Icon className="w-4 h-4" />
                             <span className="text-sm">{tab.label}</span>
@@ -112,8 +105,6 @@ export default function MyShop() {
             <div>
                 {activeTab === 'profile' && tenant && <ShopProfile tenant={tenant} />}
                 {activeTab === 'services' && tenant && <ServicesManagement tenant={tenant} />}
-                {activeTab === 'commission' && tenant && <CommissionSettings tenant={tenant} />}
-                {activeTab === 'loyalty' && <LoyaltySettings />}
                 {activeTab === 'subscription' && tenant && <SubscriptionCard tenant={tenant} />}
             </div>
         </div>

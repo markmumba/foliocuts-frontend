@@ -1,3 +1,5 @@
+import type { PaymentMethod, PaymentStatus } from "./enums";
+
 export interface RecordResponse {
     id: number;
     recordCode: string;
@@ -26,6 +28,8 @@ export interface RecordList {
     id: string;
     recordCode: string;
     customerPhoneNumber: string;
+    paymentMethod: PaymentMethod;
+    paymentStatus: PaymentStatus;
     customerName: string;
     totalAmount: string;
     discountAmount: string;

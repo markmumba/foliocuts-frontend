@@ -38,9 +38,16 @@ interface DataTableProps<TData, TValue> {
     data: TData[];
     onDeleteSelected?: (rows: TData[]) => Promise<void> | void;
     isDeleting?: boolean;
+    onRowClick?: (row: TData) => void;
 }
 
-export function StaffDataTable<TData, TValue>({ columns, data, onDeleteSelected, isDeleting }: DataTableProps<TData, TValue>) {
+export function StaffDataTable<TData, TValue>({
+    columns,
+    data,
+    onDeleteSelected,
+    isDeleting,
+    onRowClick,
+}: DataTableProps<TData, TValue>) {
 
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -152,7 +159,8 @@ export function StaffDataTable<TData, TValue>({ columns, data, onDeleteSelected,
                             <TableRow
                                 key={row.id}
                                 data-state={row.getIsSelected() && "selected"}
-                                className="hover:bg-muted/50 transition-colors"
+                                className={`hover:bg-muted/50 transition-colors ${onRowClick ? "cursor-pointer" : ""}`}
+                                onClick={() => onRowClick?.(row.original as TData)}
                             >
                                 {row.getVisibleCells().map((cell) => (
                                     <TableCell key={cell.id}>
@@ -189,7 +197,7 @@ export function StaffDataTable<TData, TValue>({ columns, data, onDeleteSelected,
                         onClick={() => table.setPageIndex(0)}
                         disabled={!table.getCanPreviousPage()}
                     >
-                         First
+                        First
                     </Button>
                     <Button
                         variant="outline"
@@ -216,7 +224,7 @@ export function StaffDataTable<TData, TValue>({ columns, data, onDeleteSelected,
                         onClick={() => table.setPageIndex(Math.max(pageCount - 1, 0))}
                         disabled={!table.getCanNextPage()}
                     >
-                        Last 
+                        Last
                     </Button>
                 </div>
             </div>
