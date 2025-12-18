@@ -80,7 +80,7 @@ export default function Services() {
                                     <div
                                         key={service.id}
                                         onClick={() => navigate(`/dashboard/services/${service.id}`)}
-                                        className="group rounded-xl p-6 bg-gradient-to-br from-primary/5 via-accent/5 to-background border border-border/60 hover:border-accent hover:shadow-lg transition-all cursor-pointer"
+                                        className="group rounded-xl p-6 bg-linear-to-br from-primary/5 via-accent/5 to-background border border-border/60 hover:border-accent hover:shadow-lg transition-all cursor-pointer"
                                     >
                                         <div className="flex items-start justify-between mb-4">
                                             <div>
