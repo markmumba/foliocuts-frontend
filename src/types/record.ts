@@ -35,6 +35,12 @@ export interface RecordList {
     discountAmount: string;
     finalAmount: string;
     status: string;
+    servicesAndStaff: ServiceStaff[];
+}
+
+export interface ServiceStaff {
+    serviceName: string;
+    staffName: string;
 }
 
 

@@ -125,15 +125,20 @@ export default function ServiceType() {
                 <>
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold mb-2">Service Types</h1>
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 mb-2">
+                                <span className="w-2 h-2 rounded-full bg-accent" />
+                                <span className="text-xs font-medium text-accent">Service Categories</span>
+                            </div>
+                            <h1 className="text-3xl font-bold mb-1 text-foreground">Service Types</h1>
                             <p className="text-muted-foreground">
-                                Manage service types available in your barbershop
+                                Group your services by category and staff role
                             </p>
                         </div>
                         {isAdmin && (
                             <Button
                                 variant="default"
                                 size="lg"
+                                className="gap-2 bg-accent text-white hover:bg-accent/90"
                                 onClick={() => setShowCreateForm(!showCreateForm)}
                             >
                                 {showCreateForm ? "Cancel" : "Create New Service Type"}
@@ -142,35 +147,76 @@ export default function ServiceType() {
                     </div>
 
                     {serviceTypes?.data && serviceTypes.data.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {serviceTypes.data.map((serviceType) => (
-                                <div
-                                    key={serviceType.id}
-                                    onClick={() => navigate(`/dashboard/service-types/${serviceType.id}/services`)}
-                                    className="border border-border rounded-lg p-6 bg-card hover:shadow-md transition-shadow"
-                                >
-                                    <div className="flex items-start justify-between mb-3">
-                                        <h3 className="text-xl font-semibold text-card-foreground">
-                                            {serviceType.name}
-                                        </h3>
-                                        <span className="px-2 py-1 text-xs font-medium rounded-md bg-secondary text-secondary-foreground">
-                                            {serviceType.staffRole}
-                                        </span>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                            {serviceTypes.data.map((serviceType) => {
+                                const roleLabel =
+                                    serviceType.staffRole === "BARBER" ? "Barber Services" : "Support Services";
+
+                                return (
+                                    <div
+                                        key={serviceType.id}
+                                        onClick={() =>
+                                            navigate(`/dashboard/service-types/${serviceType.id}/services`)
+                                        }
+                                        className="group rounded-md p-6 bg-linear-to-br from-primary/5 via-accent/5 to-background border border-border/60 hover:border-accent hover:shadow-lg transition-all cursor-pointer"
+                                    >
+                                        <div className="flex items-start justify-between mb-3">
+                                            <div>
+                                                <h3 className="text-lg font-semibold text-foreground group-hover:text-accent transition-colors">
+                                                    {serviceType.name}
+                                                </h3>
+                                                {serviceType.description && (
+                                                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                                        {serviceType.description}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <span
+                                                className={`px-2 py-1 text-[11px] font-medium rounded-full border
+                                                    ${
+                                                        serviceType.staffRole === "BARBER"
+                                                            ? "bg-yellow-100 text-yellow-700 border-yellow-200"
+                                                            : "bg-yellow-100 text-yellow-700 border-yellow-200"
+                                                    }
+                                                `}
+                                            >
+                                                {roleLabel}
+                                            </span>
+                                        </div>
+
+                                        <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+                                            <span>
+                                                Created{" "}
+                                                {new Date(serviceType.createdAt).toLocaleDateString("en-KE", {
+                                                    year: "numeric",
+                                                    month: "short",
+                                                    day: "numeric",
+                                                })}
+                                            </span>
+                                            <span className="font-medium text-accent group-hover:text-accent/80">
+                                                View services →
+                                            </span>
+                                        </div>
                                     </div>
-                                    {serviceType.description && (
-                                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                                            {serviceType.description}
-                                        </p>
-                                    )}
-                                    <div className="text-xs text-muted-foreground">
-                                        Created: {new Date(serviceType.createdAt).toLocaleDateString()}
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     ) : (
-                        <div className="border border-border rounded-lg p-12 text-center bg-card">
-                            <p className="text-muted-foreground">No service types found</p>
+                        <div className="border border-dashed border-border rounded-xl p-12 text-center bg-card">
+                            <p className="text-muted-foreground mb-2">No service types found</p>
+                            <p className="text-sm text-muted-foreground mb-4">
+                                Create categories like Haircut, Beard Trim, or Nail Services to organise your menu
+                            </p>
+                            {isAdmin && (
+                                <Button
+                                    variant="secondary"
+                                    size="lg"
+                                    className="gap-2"
+                                    onClick={() => setShowCreateForm(true)}
+                                >
+                                    + Create Your First Service Type
+                                </Button>
+                            )}
                         </div>
                     )}
 

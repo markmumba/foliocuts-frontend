@@ -30,6 +30,7 @@ import MyShop from './pages/tenant/myshop'
 import Login from './pages/auth/login'
 import Customer from './pages/customers/customer'
 import SingleCustomer from './pages/customers/single-customer'
+import Reports from './pages/reports/reports'
 
 
 
@@ -230,6 +231,14 @@ function App() {
                 element={
                   <ProtectedRoute allowedRoles={[Role.ADMIN, Role.OWNER]}>
                     <Settings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/reports"
+                element={
+                  <ProtectedRoute allowedRoles={[Role.OWNER]}>
+                    <Reports />
                   </ProtectedRoute>
                 }
               />

@@ -71,42 +71,63 @@ export default function ServiceTypeServices() {
             {services?.data && services.data.length > 0 ? (
                 <>
                     <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-semibold text-card-foreground">
-                            Services ({services.data.length})
-                        </h2>
+                        <div>
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 mb-2">
+                                <span className="w-2 h-2 rounded-full bg-accent" />
+                                <span className="text-xs font-medium text-accent">
+                                    Services in this Type
+                                </span>
+                            </div>
+                            <h2 className="text-2xl font-semibold text-foreground">
+                                Services ({services.data.length})
+                            </h2>
+                        </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                         {services.data.map((service) => (
                             <div
                                 key={service.id}
                                 onClick={() => navigate(`/dashboard/services/${service.id}`)}
-                                className="border border-border rounded-lg p-6 bg-card hover:shadow-md transition-all cursor-pointer group"
+                                className="group rounded-xl p-6 bg-gradient-to-br from-primary/5 via-accent/5 to-background border border-border/60 hover:border-accent hover:shadow-lg transition-all cursor-pointer"
                             >
-                                <div className="flex items-start justify-between mb-3">
-                                    <h3 className="text-xl font-semibold text-card-foreground group-hover:text-primary transition-colors">
-                                        {service.name}
-                                    </h3>
-                                    {service.isActive && (
-                                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-500/10 text-green-600 dark:text-green-400">
-                                            Active
-                                        </span>
-                                    )}
-                                </div>
-                                {service.description && (
-                                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                                        {service.description}
-                                    </p>
-                                )}
-                                <div className="flex items-center justify-between pt-4 border-t border-border">
-                                    <div className="flex items-center gap-2">
-                                        <DollarSign className="w-4 h-4 text-muted-foreground" />
-                                        <span className="text-lg font-bold text-card-foreground">
-                                            KSh {service.price.toFixed(2)}
-                                        </span>
+                                <div className="flex items-start justify-between mb-4">
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-foreground group-hover:text-accent transition-colors">
+                                            {service.name}
+                                        </h3>
+                                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                            {service.description}
+                                        </p>
                                     </div>
-                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                        <Percent className="w-3 h-3" />
-                                        <span>{service.defaultCommissionRate}%</span>
+                                    <span
+                                        className={`px-2 py-1 rounded-full text-[11px] font-medium
+                                            ${service.isActive
+                                                ? "bg-emerald-100 text-emerald-700"
+                                                : "bg-gray-100 text-gray-500"}
+                                        `}
+                                    >
+                                        {service.isActive ? "Active" : "Inactive"}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center justify-between mt-2">
+                                    <div className="space-y-1">
+                                        <p className="text-xs text-muted-foreground uppercase tracking-wide flex items-center gap-1">
+                                            <DollarSign className="w-3 h-3 text-muted-foreground" />
+                                            Price
+                                        </p>
+                                        <p className="text-xl font-bold text-primary">
+                                            KES {service.price.toLocaleString()}
+                                        </p>
+                                    </div>
+                                    <div className="text-right space-y-1">
+                                        <p className="text-xs text-muted-foreground uppercase tracking-wide flex items-center gap-1 justify-end">
+                                            <Percent className="w-3 h-3 text-muted-foreground" />
+                                            Default Commission
+                                        </p>
+                                        <p className="text-sm font-semibold text-accent">
+                                            {service.defaultCommissionRate}%
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -114,7 +135,7 @@ export default function ServiceTypeServices() {
                     </div>
                 </>
             ) : (
-                <div className="border border-border rounded-lg p-12 text-center bg-card">
+                <div className="border border-dashed border-border rounded-xl p-12 text-center bg-card">
                     <div className="max-w-md mx-auto">
                         <Tag className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
                         <h3 className="text-lg font-semibold text-card-foreground mb-2">

@@ -98,7 +98,7 @@ const menuItems: MenuItem[] = [
     {
         title: "Reports",
         icon: BarChart3,
-        url: "/reports",
+        url: "/dashboard/reports",
         roles: [Role.OWNER, Role.ADMIN],
     },
     {
