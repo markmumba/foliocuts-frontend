@@ -13,19 +13,44 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import type { RecordList } from "@/types/record";
+import type { PaginationMetadata } from "@/types/api";
 import { Outlet, useNavigate, useLocation, Link } from "react-router";
 import { Search, Download, TrendingUp, DollarSign, Calendar, Scissors } from "lucide-react";
 import { RecordFilters } from "@/components/records/RecordFilters";
 import { DataTable } from "./record-table-definition/data-table";
 import { buildRecordColumns } from "./record-table-definition/column";
 
+const formatDate = (d: Date) => d.toISOString().slice(0, 10); // yyyy-mm-dd
+
+function getDateRange(range: string) {
+    const today = new Date();
+    const end = formatDate(today);
+
+    const startDate = new Date(today);
+    if (range === "today") return { dateFrom: end, dateTo: end };
+    if (range === "yesterday") {
+        startDate.setDate(startDate.getDate() - 1);
+        const d = formatDate(startDate);
+        return { dateFrom: d, dateTo: d };
+    }
+    if (range === "week") {
+        startDate.setDate(startDate.getDate() - 6);
+        return { dateFrom: formatDate(startDate), dateTo: end };
+    }
+    if (range === "month") {
+        startDate.setDate(startDate.getDate() - 29);
+        return { dateFrom: formatDate(startDate), dateTo: end };
+    }
+    return { dateFrom: undefined, dateTo: undefined };
+}
+
 export default function Records() {
     const navigate = useNavigate();
     const location = useLocation();
     const isCreatePage = location.pathname.includes('/create');
     const isSingleRecordPage = /\/dashboard\/records\/\d+$/.test(location.pathname);
-    const [page] = useState(1);
-    const pageSize = 50;
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
 
@@ -35,27 +60,18 @@ export default function Records() {
     const [paymentFilter, setPaymentFilter] = useState('all');
     const [statusFilter, setStatusFilter] = useState('all');
 
+    // 3s debounce for search
     useEffect(() => {
-        const handler = setTimeout(() => setDebouncedSearch(searchQuery.trim()), 400);
+        const handler = setTimeout(() => setDebouncedSearch(searchQuery.trim()), 3000);
         return () => clearTimeout(handler);
     }, [searchQuery]);
 
-    const { data, isLoading, error } = useRecords(page, pageSize, debouncedSearch);
-    const { data: staffData } = useUsers();
+    // Reset to first page when filters/search change
+    useEffect(() => {
+        setPage(1);
+    }, [debouncedSearch, dateRange, staffFilter, paymentFilter, statusFilter]);
 
-    const allRecords = useMemo<RecordList[]>(() => {
-        const payload = data?.data;
-        if (Array.isArray(payload)) {
-            return payload;
-        }
-        if (payload && Array.isArray((payload as { items?: RecordList[] }).items)) {
-            return (payload as { items: RecordList[] }).items;
-        }
-        if (payload && Array.isArray((payload as { content?: RecordList[] }).content)) {
-            return (payload as { content: RecordList[] }).content;
-        }
-        return [];
-    }, [data]);
+    const { data: staffData } = useUsers();
 
     const staff = useMemo(() => {
         const payload = staffData?.data;
@@ -65,29 +81,84 @@ export default function Records() {
         return [];
     }, [staffData]);
 
-    // Apply client-side filters
-    const filteredRecords = useMemo(() => {
-        return allRecords.filter(record => {
-            const matchesStatus = statusFilter === 'all' || record.status?.toUpperCase() === statusFilter;
-            // Note: We don't have staff or payment info in RecordList, so those filters won't work
-            // unless we add that data to the backend response
-            return matchesStatus;
-        });
-    }, [allRecords, statusFilter]);
+    const { data, isLoading, isFetching, error } = useRecords(
+        useMemo(() => {
+            const { dateFrom, dateTo } = getDateRange(dateRange);
+
+            // Map staffFilter (ID) to staff fullName
+            let staffName: string | undefined = undefined;
+            if (staffFilter !== 'all') {
+                const staffId = parseInt(staffFilter, 10);
+                const selectedStaff = staff.find(s => s.id === staffId);
+                staffName = selectedStaff?.fullName || undefined;
+            }
+
+            return {
+                page,
+                size: pageSize,
+                search: debouncedSearch || undefined,
+                staffName,
+                paymentMethod: paymentFilter === 'all' ? undefined : paymentFilter,
+                status: statusFilter === 'all' ? undefined : statusFilter,
+                dateFrom,
+                dateTo,
+            };
+        }, [page, pageSize, debouncedSearch, paymentFilter, statusFilter, dateRange, staffFilter, staff])
+    );
+
+    const { allRecords, pagination } = useMemo(() => {
+        const payload = data?.data as unknown;
+
+        // Case 1: PaginatedData<RecordList>
+        if (
+            payload &&
+            typeof payload === "object" &&
+            Array.isArray((payload as { items?: RecordList[] }).items)
+        ) {
+            const p = payload as { items: RecordList[]; metadata?: PaginationMetadata };
+            return {
+                allRecords: p.items ?? [],
+                pagination: p.metadata,
+            };
+        }
+
+        // Case 2: Simple array
+        if (Array.isArray(payload)) {
+            return {
+                allRecords: payload as RecordList[],
+                pagination: undefined as PaginationMetadata | undefined,
+            };
+        }
+
+        // Case 3: Spring-style { content, ... }
+        if (
+            payload &&
+            typeof payload === "object" &&
+            Array.isArray((payload as { content?: RecordList[] }).content)
+        ) {
+            const p = payload as { content: RecordList[] };
+            return {
+                allRecords: p.content ?? [],
+                pagination: undefined as PaginationMetadata | undefined,
+            };
+        }
+
+        return { allRecords: [] as RecordList[], pagination: undefined as PaginationMetadata | undefined };
+    }, [data]);
 
     const stats = useMemo(() => {
-        const total = filteredRecords.length;
-        const completed = filteredRecords.filter((record) => record.status?.toUpperCase() === "COMPLETED").length;
-        const pending = filteredRecords.filter((record) => record.status?.toUpperCase() === "PENDING").length;
-        const totalRevenue = filteredRecords
+        const total = allRecords.length;
+        const completed = allRecords.filter((record) => record.status?.toUpperCase() === "COMPLETED").length;
+        const pending = allRecords.filter((record) => record.status?.toUpperCase() === "PENDING").length;
+        const totalRevenue = allRecords
             .filter(r => r.status?.toUpperCase() === "COMPLETED")
             .reduce((sum, record) => sum + (Number(record.finalAmount) || 0), 0);
-        const totalDiscount = filteredRecords.reduce((sum, record) => sum + (Number(record.discountAmount) || 0), 0);
+        const totalDiscount = allRecords.reduce((sum, record) => sum + (Number(record.discountAmount) || 0), 0);
         return { total, completed, pending, totalRevenue, totalDiscount };
-    }, [filteredRecords]);
+    }, [allRecords]);
 
     const handleExport = () => {
-        console.log('Exporting records...', filteredRecords);
+        console.log('Exporting records...', allRecords);
     };
 
     const handleViewDetails = (record: RecordList) => {
@@ -219,10 +290,115 @@ export default function Records() {
                     </div>
 
                     {/* Records Table */}
-                    <DataTable
-                        columns={buildRecordColumns(handleViewDetails)}
-                        data={filteredRecords}
-                    />
+                    <div className="space-y-4">
+                        <div className="relative">
+                            <DataTable
+                                columns={buildRecordColumns(handleViewDetails)}
+                                data={allRecords}
+                            />
+                            {isFetching && !isLoading && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-background/40">
+                                    <Spinner />
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Pagination Controls */}
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-sm text-muted-foreground">
+                            {/* Page size selector (bottom-left) */}
+                            <div className="flex items-center gap-2">
+                                <span>Rows per page</span>
+                                <select
+                                    value={pageSize}
+                                    onChange={(e) => {
+                                        const newSize = Number(e.target.value) || 10;
+                                        setPageSize(newSize);
+                                        setPage(1);
+                                    }}
+                                    className="h-8 rounded-md border border-border bg-background px-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                                >
+                                    {[10, 20, 30, 40, 50].map((size) => (
+                                        <option key={size} value={size}>
+                                            {size}
+                                        </option>
+                                    ))}
+                                </select>
+                                {pagination && (
+                                    <span className="ml-2">
+                                        Page{" "}
+                                        <span className="font-medium text-foreground">
+                                            {pagination.currentPage}
+                                        </span>{" "}
+                                        of{" "}
+                                        <span className="font-medium text-foreground">
+                                            {pagination.totalPages}
+                                        </span>
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Page navigation (bottom-right) */}
+                            <div className="flex items-center gap-2 justify-end">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={(pagination ? pagination.first : page === 1) || isLoading || isFetching}
+                                    onClick={() => {
+                                        if (pagination && !pagination.first) {
+                                            setPage(1);
+                                        } else {
+                                            setPage(1);
+                                        }
+                                    }}
+                                >
+                                    First
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={(pagination ? pagination.first : page === 1) || isLoading || isFetching}
+                                    onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                                >
+                                    Previous
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={
+                                        (pagination ? pagination.last : allRecords.length < pageSize) ||
+                                        isLoading ||
+                                        isFetching
+                                    }
+                                    onClick={() => {
+                                        if (pagination && !pagination.last) {
+                                            setPage((prev) => prev + 1);
+                                        } else if (!pagination) {
+                                            setPage((prev) => prev + 1);
+                                        }
+                                    }}
+                                >
+                                    Next
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={
+                                        (pagination ? pagination.last : allRecords.length < pageSize) ||
+                                        isLoading ||
+                                        isFetching ||
+                                        !pagination
+                                    }
+                                    onClick={() => {
+                                        if (pagination && !pagination.last) {
+                                            setPage(pagination.totalPages);
+                                        }
+                                    }}
+                                >
+                                    Last
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
                 </>
             )}
         </div>

@@ -12,6 +12,8 @@ export interface PaginationMetadata {
     totalPages: number;
     totalItems: number;
     limit: number;
+    first: boolean;
+    last: boolean;
 }
 
 export interface PaginatedData<T> {

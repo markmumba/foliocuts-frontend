@@ -2,20 +2,23 @@ import type { ApiResponse } from "@/types/api";
 import type { CreateRecordRequest, RecordList, RecordResponse } from "@/types/record";
 import { apiClient } from "./api";
 
+export interface RecordFilters {
+    page: number;
+    size: number;
+    search?: string;
+    staffName?: string;
+    paymentMethod?: string;
+    status?: string;
+    dateFrom?: string;
+    dateTo?: string;
+}
+
 export const recordService = {
-    getRecords: async (
-        page: number,
-        size: number,
-        search: string
-    ): Promise<ApiResponse<RecordList[]>> => {
+    getRecords: async (filters: RecordFilters): Promise<ApiResponse<RecordList[]>> => {
         const response = await apiClient.get<ApiResponse<RecordList[]>>(
             "/transactions/records",
             {
-                params: {
-                    page,
-                    size,
-                    search,
-                },
+                params: filters,
             }
         );
         return response.data;

@@ -225,7 +225,7 @@ export function LoyaltySettings() {
       </div>
 
       {/* Preview */}
-      <div className="bg-gradient-to-br from-accent to-accent/80 rounded-xl p-6 text-white">
+      <div className="bg-linear-to-br from-accent to-accent/80 rounded-xl p-6 text-white">
         <h3 className="text-lg font-semibold mb-4">Program Preview</h3>
         <div className="bg-white/10 backdrop-blur rounded-lg p-6">
           <div className="flex items-center gap-3 mb-4">
