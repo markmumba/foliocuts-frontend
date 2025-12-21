@@ -1,17 +1,8 @@
 import type { ApiResponse } from "@/types/api";
-import type { CreateRecordRequest, RecordList, RecordResponse } from "@/types/record";
+import type { CreateRecordRequest, RecordFilters, RecordList, RecordResponse, RecordSummary } from "@/types/record";
 import { apiClient } from "./api";
 
-export interface RecordFilters {
-    page: number;
-    size: number;
-    search?: string;
-    staffName?: string;
-    paymentMethod?: string;
-    status?: string;
-    dateFrom?: string;
-    dateTo?: string;
-}
+
 
 export const recordService = {
     getRecords: async (filters: RecordFilters): Promise<ApiResponse<RecordList[]>> => {
@@ -20,6 +11,12 @@ export const recordService = {
             {
                 params: filters,
             }
+        );
+        return response.data;
+    },
+    getRecordSummary: async (): Promise<ApiResponse<RecordSummary>> => {
+        const response = await apiClient.get<ApiResponse<RecordSummary>>(
+            "/transactions/records/summary"
         );
         return response.data;
     },
@@ -40,4 +37,5 @@ export const recordService = {
         );
         return response.data;
     },
+
 };

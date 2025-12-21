@@ -26,8 +26,10 @@ import {
     Calendar,
     Phone,
     Scissors,
-    Star,
-    Wallet,
+    User,
+    Gift,
+    TrendingUp,
+    Download,
 } from "lucide-react";
 import type {
     CustomerLoyaltyTracker,
@@ -106,88 +108,94 @@ function SingleCustomer() {
     }
 
     return (
-        <div className="min-h-screen bg-background p-6">
-            <Breadcrumb className="mb-4">
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink asChild>
-                            <Link to="/dashboard">Dashboard</Link>
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbLink asChild>
-                            <Link to="/dashboard/customers">Customers</Link>
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>{customer.customerCode}</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
+        <div className="p-8">
+            {/* Header with Back Button */}
+            <div className="mb-8">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4 transition-colors"
+                >
+                    <ArrowLeft className="w-5 h-5" />
+                    Back to Customers
+                </button>
 
-            <Button
-                variant="ghost"
-                className="mb-4 gap-2"
-                onClick={() => navigate(-1)}
-            >
-                <ArrowLeft className="h-4 w-4" />
-                Back to customers
-            </Button>
-
-            {/* Header / hero */}
-            <div className="overflow-hidden rounded-2xl border bg-linear-to-r from-primary to-primary/70 text-primary-foreground shadow-xl">
-                <div className="p-6 sm:p-10">
-                    <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                        <div className="flex items-start gap-4">
-                            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-foreground/20">
-                                <Star className="h-8 w-8" />
-                            </div>
-                            <div>
-                                <div className="mb-2 flex flex-wrap items-center gap-2 text-sm">
-                                    <Badge variant="secondary">Loyal Customer</Badge>
-                                    <Badge variant="outline">{customer.phoneNumber}</Badge>
-                                </div>
-                                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                                    {customer.customerCode}
-                                </h1>
-                                <p className="text-sm text-primary-foreground/80">
-                                    Joined {formatDateTime(customer.createdAt)}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3">
-                            <StatPill
-                                label="Total Visits"
-                                value={customer.totalVisits}
-                                icon={<Scissors className="h-4 w-4" />}
-                            />
-                            <StatPill
-                                label="Total Spent"
-                                value={formatCurrency(customer.totalSpent)}
-                                icon={<Wallet className="h-4 w-4" />}
-                            />
-                            <StatPill
-                                label="Total Saved"
-                                value={formatCurrency(totalSaved)}
-                                icon={<Star className="h-4 w-4" />}
-                            />
-                        </div>
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <div>
+                        <Breadcrumb className="mb-4">
+                            <BreadcrumbList>
+                                <BreadcrumbItem>
+                                    <BreadcrumbLink asChild>
+                                        <Link to="/dashboard">Dashboard</Link>
+                                    </BreadcrumbLink>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem>
+                                    <BreadcrumbLink asChild>
+                                        <Link to="/dashboard/customers">Customers</Link>
+                                    </BreadcrumbLink>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem>
+                                    <BreadcrumbPage>{customer.customerCode}</BreadcrumbPage>
+                                </BreadcrumbItem>
+                            </BreadcrumbList>
+                        </Breadcrumb>
+                        <h1 className="text-3xl font-bold text-foreground mb-2">Customer Profile</h1>
+                        <p className="text-muted-foreground">Complete details for {customer.customerCode}</p>
                     </div>
                 </div>
             </div>
 
-            <div className="mt-8 grid gap-6 lg:grid-cols-3">
-                <div className="space-y-6 lg:col-span-2">
-                    {/* Visit history */}
-                    <section className="rounded-xl border bg-card p-6">
-                        <div className="mb-4 flex items-center justify-between">
-                            <h2 className="text-lg font-semibold">Visit History</h2>
-                            <Badge variant="secondary">
-                                {customer.records?.length ?? 0} visits
-                            </Badge>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Main Content - 2 columns */}
+                <div className="lg:col-span-2 space-y-6">
+                    {/* Customer Information */}
+                    <div className="bg-card rounded-xl p-6 border border-border">
+                        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-6">
+                            <User className="w-5 h-5" />
+                            Customer Information
+                        </h2>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-sm text-muted-foreground block mb-1">Customer Code</label>
+                                    <p className="text-foreground font-medium font-mono text-sm">{customer.customerCode}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm text-muted-foreground block mb-1">Phone Number</label>
+                                    <p className="text-foreground font-medium flex items-center gap-2">
+                                        <Phone className="w-4 h-4 text-muted-foreground" />
+                                        {customer.phoneNumber}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-sm text-muted-foreground block mb-1">First Visit</label>
+                                    <p className="text-foreground font-medium flex items-center gap-2">
+                                        <Calendar className="w-4 h-4 text-muted-foreground" />
+                                        {formatDateTime(customer.createdAt)}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label className="text-sm text-muted-foreground block mb-1">Last Updated</label>
+                                    <p className="text-foreground font-medium flex items-center gap-2">
+                                        <Calendar className="w-4 h-4 text-muted-foreground" />
+                                        {formatDateTime(customer.updatedAt)}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+
+                    {/* Visit history */}
+                    <div className="bg-card rounded-xl p-6 border border-border">
+                        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-6">
+                            <Scissors className="w-5 h-5" />
+                            Visit History
+                        </h2>
                         <div className="overflow-x-auto">
                             <Table>
                                 <TableHeader>
@@ -203,19 +211,33 @@ function SingleCustomer() {
                                 <TableBody>
                                     {customer.records?.length ? (
                                         customer.records.map((record: CustomerRecord) => (
-                                            <TableRow key={record.id}>
-                                                <TableCell>{record.recordCode}</TableCell>
+                                            <TableRow
+                                                key={record.id}
+                                                className="cursor-pointer hover:bg-muted/50"
+                                                onClick={() => navigate(`/dashboard/records/${record.id}`)}
+                                            >
+                                                <TableCell className="font-medium">{record.recordCode}</TableCell>
                                                 <TableCell>{formatDateTime(record.createdAt)}</TableCell>
                                                 <TableCell>
-                                                    <Badge variant="outline">{record.status}</Badge>
+                                                    <Badge
+                                                        variant={
+                                                            record.status?.toUpperCase() === 'COMPLETED'
+                                                                ? 'default'
+                                                                : record.status?.toUpperCase() === 'PENDING'
+                                                                    ? 'secondary'
+                                                                    : 'destructive'
+                                                        }
+                                                    >
+                                                        {record.status}
+                                                    </Badge>
                                                 </TableCell>
-                                                <TableCell className="text-right">
+                                                <TableCell className="text-right font-medium">
                                                     {formatCurrency(record.totalAmount)}
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     {formatCurrency(record.discountAmount)}
                                                 </TableCell>
-                                                <TableCell className="text-right">
+                                                <TableCell className="text-right font-semibold">
                                                     {formatCurrency(record.finalAmount)}
                                                 </TableCell>
                                             </TableRow>
@@ -233,24 +255,14 @@ function SingleCustomer() {
                                 </TableBody>
                             </Table>
                         </div>
-                        {customer.records?.length ? (
-                            <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
-                                <span>
-                                    Total final amount:{" "}
-                                    <strong>{formatCurrency(totalFinalAmount)}</strong>
-                                </span>
-                            </div>
-                        ) : null}
-                    </section>
+                    </div>
 
                     {/* Loyalty progress */}
-                    <section className="rounded-xl border bg-card p-6">
-                        <div className="mb-4 flex items-center justify-between">
-                            <h2 className="text-lg font-semibold">Loyalty Progress</h2>
-                            <Badge variant="secondary">
-                                {activeTrackers.length} active programs
-                            </Badge>
-                        </div>
+                    <div className="bg-card rounded-xl p-6 border border-border">
+                        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-6">
+                            <Gift className="w-5 h-5" />
+                            Loyalty Progress
+                        </h2>
                         {activeTrackers.length ? (
                             <div className="space-y-4">
                                 {activeTrackers.map((tracker: CustomerLoyaltyTracker) => {
@@ -264,12 +276,12 @@ function SingleCustomer() {
                                     return (
                                         <div
                                             key={tracker.id}
-                                            className="rounded-lg border bg-muted/40 p-4"
+                                            className="rounded-lg border border-border bg-muted/40 p-4"
                                         >
                                             <div className="mb-2 flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
                                                     <Scissors className="h-4 w-4 text-primary" />
-                                                    <h3 className="font-semibold">
+                                                    <h3 className="font-semibold text-foreground">
                                                         {tracker.serviceName}
                                                     </h3>
                                                 </div>
@@ -285,7 +297,7 @@ function SingleCustomer() {
                                             </div>
                                             <p className="text-xs text-muted-foreground">
                                                 Total earned:{" "}
-                                                <span className="font-medium">
+                                                <span className="font-medium text-foreground">
                                                     {formatCurrency(tracker.totalEarned)}
                                                 </span>
                                             </p>
@@ -298,83 +310,79 @@ function SingleCustomer() {
                                 This customer is not enrolled in any loyalty programs yet.
                             </p>
                         )}
-                    </section>
+                    </div>
                 </div>
 
-                {/* Right column: contact & quick actions */}
+                {/* Sidebar - 1 column */}
                 <div className="space-y-6">
-                    <section className="rounded-xl border bg-card p-6">
-                        <h2 className="mb-4 text-lg font-semibold">Customer Details</h2>
-                        <div className="space-y-4 text-sm text-muted-foreground">
-                            <InfoRow
-                                icon={<Phone className="h-4 w-4" />}
-                                label="Phone Number"
-                                value={customer.phoneNumber}
-                            />
-                            <InfoRow
-                                icon={<Calendar className="h-4 w-4" />}
-                                label="First Visit"
-                                value={formatDateTime(customer.createdAt)}
-                            />
-                            <InfoRow
-                                icon={<Calendar className="h-4 w-4" />}
-                                label="Last Updated"
-                                value={formatDateTime(customer.updatedAt)}
-                            />
-                        </div>
-                    </section>
+                    {/* Customer Summary */}
+                    <div className="bg-card rounded-xl p-6 border border-border">
+                        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-6">
+                            <TrendingUp className="w-5 h-5" />
+                            Customer Summary
+                        </h2>
 
-                    <section className="rounded-xl border bg-card p-6">
-                        <h2 className="mb-4 text-lg font-semibold">Quick Actions</h2>
+                        <div className="space-y-4">
+                            <div className="pb-4 border-b border-border">
+                                <label className="text-sm text-muted-foreground block mb-1">Total Visits</label>
+                                <p className="text-2xl font-bold text-foreground">
+                                    {customer.totalVisits ?? 0}
+                                </p>
+                            </div>
+
+                            <div className="pb-4 border-b border-border">
+                                <label className="text-sm text-muted-foreground block mb-1">Total Spent</label>
+                                <p className="text-xl font-semibold text-foreground">
+                                    {formatCurrency(customer.totalSpent)}
+                                </p>
+                            </div>
+
+                            <div>
+                                <label className="text-sm text-muted-foreground block mb-1">Total Saved</label>
+                                <p className="text-xl font-bold text-green-600">{formatCurrency(totalSaved)}</p>
+                                <p className="text-xs text-muted-foreground mt-1">From discounts</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Quick Stats */}
+                    <div className="bg-linear-to-br from-primary to-primary/80 rounded-xl p-6 text-primary-foreground">
+                        <h3 className="text-lg font-semibold mb-4">Quick Stats</h3>
                         <div className="space-y-3">
-                            <Button className="w-full" variant="outline">
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm opacity-90">Total Records</span>
+                                <span className="text-sm font-medium">{customer.records?.length ?? 0}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm opacity-90">Total Final Amount</span>
+                                <span className="text-sm font-medium">{formatCurrency(totalFinalAmount)}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm opacity-90">Active Programs</span>
+                                <span className="text-sm font-medium">{activeTrackers.length}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="bg-card rounded-xl p-6 border border-border">
+                        <h3 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h3>
+                        <div className="space-y-2">
+                            <Button className="w-full justify-start" variant="outline">
+                                <Download className="w-4 h-4 mr-2" />
                                 Export History
                             </Button>
+                            <Button
+                                className="w-full justify-start"
+                                variant="default"
+                                onClick={() => navigate("/dashboard/records/create")}
+                            >
+                                <Scissors className="w-4 h-4 mr-2" />
+                                Create New Record
+                            </Button>
                         </div>
-                    </section>
+                    </div>
                 </div>
-            </div>
-        </div>
-    );
-}
-
-function StatPill({
-    label,
-    value,
-    icon,
-}: {
-    label: string;
-    value: string | number | undefined;
-    icon: React.ReactNode;
-}) {
-    return (
-        <div className="rounded-2xl bg-primary-foreground/15 px-4 py-3 text-center text-primary-foreground">
-            <div className="mb-1 flex items-center justify-center gap-2 text-xs uppercase tracking-wide">
-                {icon}
-                {label}
-            </div>
-            <div className="text-2xl font-semibold">{value ?? "0"}</div>
-        </div>
-    );
-}
-
-function InfoRow({
-    icon,
-    label,
-    value,
-}: {
-    icon: React.ReactNode;
-    label: string;
-    value: string | undefined;
-}) {
-    return (
-        <div className="flex items-center gap-3 rounded-lg border bg-muted/30 px-3 py-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-                {icon}
-            </div>
-            <div>
-                <p className="text-xs text-muted-foreground">{label}</p>
-                <p className="font-medium text-card-foreground">{value || "—"}</p>
             </div>
         </div>
     );

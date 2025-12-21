@@ -126,7 +126,7 @@ export default function CreateStaff() {
 
         const payload: CreateStaffRequest = {
             emails: emailArray,
-            serviceTypeId: selectedRole,
+            staffRole: selectedRole as Role,
         };
 
         createMutation.mutate(payload);

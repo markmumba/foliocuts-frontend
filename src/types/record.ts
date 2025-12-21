@@ -62,3 +62,21 @@ export interface CompleteRecordRequest {
     cashReceivedBy: string;
     notes: string;
 }
+
+export interface RecordSummary {
+    numberOfRecords: string;
+    totalRevenue: string ;
+    totalDiscount: string;
+    pending: string;
+}
+
+export interface RecordFilters {
+    page: number;
+    size: number;
+    search?: string;
+    staffName?: string;
+    paymentMethod?: string;
+    status?: string;
+    dateFrom?: string;
+    dateTo?: string;
+}

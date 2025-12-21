@@ -63,7 +63,7 @@ const menuItems: MenuItem[] = [
         title: "Staff",
         icon: Users,
         url: "/dashboard/staff",
-        roles: [Role.OWNER, Role.RECEPTIONIST],
+        roles: [Role.OWNER],
     },
     {
         title: "Service Types",
@@ -87,7 +87,7 @@ const menuItems: MenuItem[] = [
         title: "Records",
         icon: CreditCard,
         url: "/dashboard/records",
-        roles: [Role.OWNER],
+        roles: [Role.OWNER, Role.RECEPTIONIST],
     },
     {
         title: "Subscription Templates",
@@ -99,7 +99,7 @@ const menuItems: MenuItem[] = [
         title: "Reports",
         icon: BarChart3,
         url: "/dashboard/reports",
-        roles: [Role.OWNER, Role.ADMIN],
+        roles: [Role.OWNER],
     },
     {
         title: "Settings",

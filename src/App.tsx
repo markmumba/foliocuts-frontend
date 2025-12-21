@@ -120,7 +120,7 @@ function App() {
               <Route
                 path="/dashboard/service-types"
                 element={
-                  <ProtectedRoute allowedRoles={[Role.ADMIN, Role.OWNER]}>
+                  <ProtectedRoute allowedRoles={[Role.ADMIN, Role.OWNER, Role.RECEPTIONIST]}>
                     <ServiceType />
                   </ProtectedRoute>
                 }
@@ -179,7 +179,7 @@ function App() {
               <Route
                 path="/dashboard/records"
                 element={
-                  <ProtectedRoute allowedRoles={[Role.OWNER]}>
+                  <ProtectedRoute allowedRoles={[Role.OWNER,Role.RECEPTIONIST]}>
                     <Records />
                   </ProtectedRoute>
                 }
@@ -187,7 +187,7 @@ function App() {
                 <Route
                   path="create"
                   element={
-                    <ProtectedRoute allowedRoles={[Role.OWNER]} requireLayout={false}>
+                    <ProtectedRoute allowedRoles={[Role.OWNER,Role.RECEPTIONIST]} requireLayout={false}>
                       <CreateRecord />
                     </ProtectedRoute>
                   }
@@ -195,7 +195,7 @@ function App() {
                 <Route
                   path=":recordId"
                   element={
-                    <ProtectedRoute allowedRoles={[Role.OWNER]} requireLayout={false}>
+                    <ProtectedRoute allowedRoles={[Role.OWNER,Role.RECEPTIONIST]} requireLayout={false}>
                       <SingleRecord />
                     </ProtectedRoute>
                   }

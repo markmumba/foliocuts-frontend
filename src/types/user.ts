@@ -13,7 +13,7 @@ export interface User {
 }
 
 export interface CreateStaffRequest {
-    serviceTypeId: string;
+    staffRole: string;
     emails: string[];
 }
 export interface DeleteStaffResponse {

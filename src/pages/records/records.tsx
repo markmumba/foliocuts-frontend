@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useRecords } from "@/hooks/useRecord";
+import { useRecords, useRecordSummary } from "@/hooks/useRecord";
 import { useUsers } from "@/hooks/userUser";
 import { Spinner } from "@/components/ui/spinner";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
@@ -54,24 +54,22 @@ export default function Records() {
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
 
-    // Filter states
     const [dateRange, setDateRange] = useState('all');
     const [staffFilter, setStaffFilter] = useState('all');
     const [paymentFilter, setPaymentFilter] = useState('all');
     const [statusFilter, setStatusFilter] = useState('all');
 
-    // 3s debounce for search
     useEffect(() => {
         const handler = setTimeout(() => setDebouncedSearch(searchQuery.trim()), 3000);
         return () => clearTimeout(handler);
     }, [searchQuery]);
 
-    // Reset to first page when filters/search change
     useEffect(() => {
         setPage(1);
     }, [debouncedSearch, dateRange, staffFilter, paymentFilter, statusFilter]);
 
     const { data: staffData } = useUsers();
+    const { data: summaryData } = useRecordSummary();
 
     const staff = useMemo(() => {
         const payload = staffData?.data;
@@ -85,7 +83,6 @@ export default function Records() {
         useMemo(() => {
             const { dateFrom, dateTo } = getDateRange(dateRange);
 
-            // Map staffFilter (ID) to staff fullName
             let staffName: string | undefined = undefined;
             if (staffFilter !== 'all') {
                 const staffId = parseInt(staffFilter, 10);
@@ -109,7 +106,6 @@ export default function Records() {
     const { allRecords, pagination } = useMemo(() => {
         const payload = data?.data as unknown;
 
-        // Case 1: PaginatedData<RecordList>
         if (
             payload &&
             typeof payload === "object" &&
@@ -146,16 +142,7 @@ export default function Records() {
         return { allRecords: [] as RecordList[], pagination: undefined as PaginationMetadata | undefined };
     }, [data]);
 
-    const stats = useMemo(() => {
-        const total = allRecords.length;
-        const completed = allRecords.filter((record) => record.status?.toUpperCase() === "COMPLETED").length;
-        const pending = allRecords.filter((record) => record.status?.toUpperCase() === "PENDING").length;
-        const totalRevenue = allRecords
-            .filter(r => r.status?.toUpperCase() === "COMPLETED")
-            .reduce((sum, record) => sum + (Number(record.finalAmount) || 0), 0);
-        const totalDiscount = allRecords.reduce((sum, record) => sum + (Number(record.discountAmount) || 0), 0);
-        return { total, completed, pending, totalRevenue, totalDiscount };
-    }, [allRecords]);
+    const summary = summaryData?.data;
 
     const handleExport = () => {
         console.log('Exporting records...', allRecords);
@@ -221,8 +208,18 @@ export default function Records() {
                                     <TrendingUp className="w-5 h-5 text-primary" />
                                 </div>
                             </div>
-                            <h3 className="text-3xl font-bold text-foreground mb-1">{stats.completed}</h3>
-                            <p className="text-xs text-muted-foreground">of {stats.total} total records</p>
+                            <h3 className="text-3xl font-bold text-foreground mb-1">
+                                {summary
+                                    ? (Number(summary.numberOfRecords || "0") - Number(summary.pending || "0")).toLocaleString()
+                                    : "—"}
+                            </h3>
+                            <p className="text-xs text-muted-foreground">
+                                of{" "}
+                                <span className="font-medium">
+                                    {summary ? Number(summary.numberOfRecords || "0").toLocaleString() : "—"}
+                                </span>{" "}
+                                total records
+                            </p>
                         </div>
 
                         <div className="bg-card rounded-xl p-6 border border-border">
@@ -232,7 +229,12 @@ export default function Records() {
                                     <DollarSign className="w-5 h-5 text-primary" />
                                 </div>
                             </div>
-                            <h3 className="text-3xl font-bold text-foreground mb-1">KES {stats.totalRevenue.toLocaleString()}</h3>
+                            <h3 className="text-3xl font-bold text-foreground mb-1">
+                                KES{" "}
+                                {summary
+                                    ? Number(summary.totalRevenue || "0").toLocaleString()
+                                    : "0"}
+                            </h3>
                             <p className="text-xs text-muted-foreground">Gross earnings</p>
                         </div>
 
@@ -243,7 +245,12 @@ export default function Records() {
                                     <Calendar className="w-5 h-5 text-green-600" />
                                 </div>
                             </div>
-                            <h3 className="text-3xl font-bold text-foreground mb-1">KES {stats.totalDiscount.toLocaleString()}</h3>
+                            <h3 className="text-3xl font-bold text-foreground mb-1">
+                                KES{" "}
+                                {summary
+                                    ? Number(summary.totalDiscount || "0").toLocaleString()
+                                    : "0"}
+                            </h3>
                             <p className="text-xs text-muted-foreground">Applied to services</p>
                         </div>
 
@@ -254,7 +261,11 @@ export default function Records() {
                                     <Scissors className="w-5 h-5 text-yellow-600" />
                                 </div>
                             </div>
-                            <h3 className="text-3xl font-bold text-foreground mb-1">{stats.pending}</h3>
+                            <h3 className="text-3xl font-bold text-foreground mb-1">
+                                {summary
+                                    ? Number(summary.pending || "0").toLocaleString()
+                                    : "—"}
+                            </h3>
                             <p className="text-xs text-muted-foreground">Awaiting completion</p>
                         </div>
                     </div>

@@ -1,6 +1,6 @@
-import { recordService, type RecordFilters } from "@/services/recordService";
+import { recordService } from "@/services/recordService";
 import type { ApiResponse } from "@/types/api";
-import type { RecordList, RecordResponse } from "@/types/record";
+import type { RecordFilters, RecordList, RecordResponse, RecordSummary } from "@/types/record";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 
 export function useRecords(filters: RecordFilters): UseQueryResult<ApiResponse<RecordList[]>, Error> {
@@ -17,3 +17,10 @@ export function useRecord(recordId: number): UseQueryResult<ApiResponse<RecordRe
         enabled: !!recordId && recordId > 0,
     })
 }   
+
+export function useRecordSummary(): UseQueryResult<ApiResponse<RecordSummary>, Error> {
+    return useQuery({
+        queryKey: ['record-summary'],
+        queryFn: () => recordService.getRecordSummary(),
+    })
+}
