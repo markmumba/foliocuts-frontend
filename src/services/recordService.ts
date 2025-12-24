@@ -1,6 +1,7 @@
 import type { ApiResponse } from "@/types/api";
 import type { CreateRecordRequest, RecordFilters, RecordList, RecordResponse, RecordSummary } from "@/types/record";
 import { apiClient } from "./api";
+import { analyticsService } from "./analyticsService";
 
 
 
@@ -14,11 +15,12 @@ export const recordService = {
         );
         return response.data;
     },
+    /**
+     * @deprecated Use analyticsService.getRecordsSummary() instead
+     * This method delegates to the analytics service for backward compatibility
+     */
     getRecordSummary: async (): Promise<ApiResponse<RecordSummary>> => {
-        const response = await apiClient.get<ApiResponse<RecordSummary>>(
-            "/transactions/records/summary"
-        );
-        return response.data;
+        return analyticsService.getRecordsSummary();
     },
     getRecord: async (
         recordId: number

@@ -1,6 +1,6 @@
 import './App.css'
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router'
-import Dashboard from './pages/Dashboard'
+import Dashboard from './pages/common/Dashboard'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Register from './pages/auth/register'
 import { NotificationProvider } from './context/NotificationContext'

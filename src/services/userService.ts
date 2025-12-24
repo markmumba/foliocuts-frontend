@@ -1,5 +1,6 @@
 import type { ApiResponse } from "@/types/api";
 import { apiClient } from "./api";
+import { analyticsService } from "./analyticsService";
 import type {
     CreateStaffRequest,
     CreateEmployeesResponse,
@@ -36,27 +37,34 @@ export const userService = {
         return response.data;
     },
 
-    // Staff Performance Metrics
+    // Staff Performance Metrics - Delegated to Analytics Service
+    /**
+     * @deprecated Use analyticsService.getStaffPerformanceSummary() instead
+     * This method delegates to the analytics service for backward compatibility
+     */
     getEmployeesPerformanceSummary: async (): Promise<ApiResponse<EmployeePerformanceSummary>> => {
-        const response = await apiClient.get<ApiResponse<EmployeePerformanceSummary>>('/users/employees-performance-summary');
-        return response.data;
+        return analyticsService.getStaffPerformanceSummary();
     },
+    /**
+     * @deprecated Use analyticsService.getStaffDailyPerformance() instead
+     * This method delegates to the analytics service for backward compatibility
+     */
     getEmployeeDailyPerformance: async (employeeId: number): Promise<ApiResponse<SingleEmployeePerformanceSummary>> => {
-        const response = await apiClient.get<ApiResponse<SingleEmployeePerformanceSummary>>(`/users/employee/${employeeId}/daily-performance`);
-        return response.data;
+        return analyticsService.getStaffDailyPerformance(employeeId);
     },
+    /**
+     * @deprecated Use analyticsService.getStaffPerformanceOverview() instead
+     * This method delegates to the analytics service for backward compatibility
+     */
     getEmployeePerformanceOverview: async (employeeId: number): Promise<ApiResponse<SingleEmployeePerformance>> => {
-        const response = await apiClient.get<ApiResponse<SingleEmployeePerformance>>(`/users/employee/${employeeId}/performance-overview`);
-        return response.data;
+        return analyticsService.getStaffPerformanceOverview(employeeId);
     },
+    /**
+     * @deprecated Use analyticsService.getStaffWeeklyPerformance() instead
+     * This method delegates to the analytics service for backward compatibility
+     */
     getEmployeeWeeklyPerformance: async (employeeId: number, startDate?: string, endDate?: string): Promise<ApiResponse<WeeklyPerformance>> => {
-        const params = new URLSearchParams();
-        if (startDate) params.append('startDate', startDate);
-        if (endDate) params.append('endDate', endDate);
-        const queryString = params.toString();
-        const url = `/users/employee/${employeeId}/weekly-performance${queryString ? `?${queryString}` : ''}`;
-        const response = await apiClient.get<ApiResponse<WeeklyPerformance>>(url);
-        return response.data;
+        return analyticsService.getStaffWeeklyPerformance(employeeId, startDate, endDate);
     },
     getEmployeeServices: async (employeeId: number): Promise<ApiResponse<EmployeeServices>> => {
         const response = await apiClient.get<ApiResponse<EmployeeServices>>(`/users/employee/${employeeId}/services`);
