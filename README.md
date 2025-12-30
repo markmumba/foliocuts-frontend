@@ -151,7 +151,7 @@ NEXT_PUBLIC_FRONTEND_URL=http://localhost:5173
 
 #### Frontend (`frontend/.env`)
 ```env
-VITE_API_URL=http://localhost:8081/api
+VITE_API_URL=http://localhost:8081/api/v1
 ```
 
 #### Backend (`backend/src/main/resources/application.yml`)

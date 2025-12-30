@@ -14,6 +14,7 @@ export function DashboardHeader() {
         <div>
           <h1 className="text-3xl font-bold text-primary">Dashboard</h1>
           <p className="text-sm text-muted-foreground mt-1">Welcome to FolioCuts</p>
+          <p className="text-sm text-muted-foreground mt-1">Watch out for the new features coming soon!</p>
         </div>
 
         <div className="flex items-center gap-4">
