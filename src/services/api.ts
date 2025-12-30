@@ -10,6 +10,8 @@ const clearAuthStorage = () => {
     localStorage.removeItem('refreshToken');
 };
 
+console.log('API_BASE_URL', API_BASE_URL);
+
 export const apiClient: AxiosInstance = axios.create({
     baseURL: API_BASE_URL,
     headers: {
