@@ -64,6 +64,14 @@ export function createSubscriptionService(apiClient: ApiClient) {
             >(`/subscription/subscription-plan-template/${id}/activate`);
             return response.data;
         },
+        deleteSubscriptionPlanTemplate: async (
+            id: string
+        ): Promise<ApiResponse<string>> => {
+            const response = await apiClient.instance.delete<
+                ApiResponse<string>
+            >(`/subscription/subscription-plan-template/${id}`);
+            return response.data;
+        },
     };
 }
 

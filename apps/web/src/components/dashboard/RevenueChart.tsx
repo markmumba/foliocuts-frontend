@@ -72,8 +72,8 @@ export function RevenueChart() {
               color: 'hsl(var(--foreground))'
             }}
             formatter={(value, name) => {
-              if (name === 'revenue') return [`KES ${value.toLocaleString()}`, 'Revenue'];
-              return [value, 'Transactions'];
+              if (name === 'revenue') return [`KES ${(value ?? 0).toLocaleString()}`, 'Revenue'];
+              return [value ?? 0, 'Transactions'];
             }}
           />
           <Legend

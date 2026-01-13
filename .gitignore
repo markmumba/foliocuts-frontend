@@ -64,3 +64,7 @@ android/app/build/
 local.properties
 *.iml
 .gradle/
+
+
+DASHBOARD_API_REQUIREMENTS.md
+ANALYTICS_MIGRATION.md

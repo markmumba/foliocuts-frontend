@@ -178,7 +178,7 @@ interface PlanCardProps {
     isDeactivated: boolean;
 }
 
-function PlanCard({ plan, parseFeatures, formatPrice, onEdit, onDelete, isDeactivated }: PlanCardProps) {
+function PlanCard({ plan, parseFeatures, formatPrice, onEdit, onDelete: _onDelete, isDeactivated }: PlanCardProps) {
     const features = parseFeatures(plan.features);
     const queryClient = useQueryClient();
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
