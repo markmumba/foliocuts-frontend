@@ -1,0 +1,172 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Background and Foreground */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* Modern Afro-Urban Color Palette */
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-neutral: var(--neutral);
+  --color-error: var(--error);
+
+  /* Light Variations */
+  --color-primary-light: var(--primary-light);
+  --color-secondary-light: var(--secondary-light);
+  --color-accent-light: var(--accent-light);
+
+  /* Text Colors */
+  --color-foreground-muted: var(--foreground-muted);
+
+  /* Component Colors */
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Chart Colors */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Sidebar Colors */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  /* Modern Afro-Urban Color Scheme - Matching Landing Page */
+  --radius: 0.625rem;
+
+  /* Core Colors */
+  --primary: #1c1e26; /* Deep Navy - professional, tech-forward */
+  --secondary: #f5b700; /* Warm Gold - premium service, crown-like */
+  --accent: #2eb67d; /* Emerald Green - fresh, growth, M-Pesa familiar */
+  --background: #ffffff; /* White background */
+  --neutral: #f5f5f5; /* Soft Grey for sections */
+  --error: #e63946; /* Vibrant Red for alerts */
+
+  /* Text Colors */
+  --foreground: #1c1e26; /* Primary color for main text */
+  --foreground-muted: #6b7280; /* Muted text color */
+
+  /* Light Variations */
+  --primary-light: #2a2d38; /* Lighter shade of primary */
+  --secondary-light: #f7c52d; /* Lighter shade of secondary */
+  --accent-light: #4ecdc4; /* Lighter shade of accent */
+
+  /* Component Colors */
+  --card: #ffffff;
+  --card-foreground: #1c1e26;
+  --popover: #ffffff;
+  --popover-foreground: #1c1e26;
+  --primary-foreground: #ffffff;
+  --secondary-foreground: #1c1e26;
+  --muted: #f5f5f5;
+  --muted-foreground: #6b7280;
+  --accent-foreground: #ffffff;
+  --destructive: #e63946;
+  --border: #e5e7eb;
+  --input: #f5f5f5;
+  --ring: #2eb67d;
+
+  /* Chart Colors */
+  --chart-1: #2eb67d; /* Accent green */
+  --chart-2: #f5b700; /* Secondary gold */
+  --chart-3: #1c1e26; /* Primary navy */
+  --chart-4: #4ecdc4; /* Accent light */
+  --chart-5: #f7c52d; /* Secondary light */
+
+  /* Sidebar Colors */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1c1e26;
+  --sidebar-primary: #1c1e26;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f5f5f5;
+  --sidebar-accent-foreground: #1c1e26;
+  --sidebar-border: #e5e7eb;
+  --sidebar-ring: #2eb67d;
+}
+
+.dark {
+  /* Lighter dark theme */
+  --background: #1e1e22; /* Softer dark */
+  --foreground: #f4f4f5;
+  
+  --card: #262629; /* Lighter cards */
+  --card-foreground: #f4f4f5;
+  
+  --popover: #262629;
+  --popover-foreground: #f4f4f5;
+  
+  --primary: #f4f4f5;
+  --primary-foreground: #1e1e22;
+  
+  --secondary: #2e2e33;
+  --secondary-foreground: #f4f4f5;
+  
+  --muted: #2e2e33;
+  --muted-foreground: #a1a1aa;
+  
+  --accent: #2eb67d;
+  --accent-foreground: #f4f4f5;
+  
+  --destructive: #ef4444;
+  
+  --border: #404048;
+  --input: #2e2e33;
+  --ring: #2eb67d;
+  
+  /* Chart Colors */
+  --chart-1: #2eb67d;
+  --chart-2: #f5b700;
+  --chart-3: #3b82f6;
+  --chart-4: #8b5cf6;
+  --chart-5: #ec4899;
+  
+  /* Sidebar */
+  --sidebar: #1e1e22;
+  --sidebar-foreground: #f4f4f5;
+  --sidebar-primary: #2eb67d;
+  --sidebar-primary-foreground: #f4f4f5;
+  --sidebar-accent: #2e2e33;
+  --sidebar-accent-foreground: #f4f4f5;
+  --sidebar-border: #404048;
+  --sidebar-ring: #2eb67d;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

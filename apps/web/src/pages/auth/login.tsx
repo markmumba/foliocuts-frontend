@@ -1,0 +1,108 @@
+import { useForm } from "@tanstack/react-form"
+import { z } from "zod"
+import { useMutation } from "@tanstack/react-query";
+import { authService } from "@/lib/api";
+import { useNavigate, useLocation } from "react-router";
+import LoginComponent from "@/components/auth/loginComponent";
+import { useNotification } from "@/context/NotificationContext";
+import { useAuth } from "@/context/AuthContext";
+import { AxiosError } from "axios";
+import { useEffect } from "react";
+import { decodeJWT } from "@/utils/utilities";
+
+const loginSchema = z.object({
+    email: z
+        .string()
+        .min(1, "Email is required")
+        .email("Please enter a valid email address"),
+    password: z
+        .string()
+        .min(1, "Password is required")
+        .min(6, "Password must be at least 6 characters"),
+})
+
+export default function Login() {
+    const navigate = useNavigate()
+    const location = useLocation()
+    const { success: notifySuccess, error: notifyError } = useNotification()
+    const { login, isAuthenticated } = useAuth()
+
+    const loginMutation = useMutation({
+        mutationFn: authService.login,
+        onSuccess: (response) => {
+            console.log("Login successful:", response)
+
+            const jwtPayload = decodeJWT(response.data.accessToken);
+            const userRole = response.data.user.role || (jwtPayload?.role as string) || null;
+            const userTenantId = response.data.user.tenantId || (jwtPayload?.tenantId ? String(jwtPayload.tenantId) : null);
+            console.log("Login return values",response.data);
+
+            login(
+                response.data.accessToken,
+                response.data.refreshToken,
+                {
+                    id: response.data.user.id,
+                    email: response.data.user.email,
+                    fullName: response.data.user.fullName,
+                    tenantId: userTenantId,
+                    phone: response.data.user.phone,
+                    role: userRole,
+                    status: response.data.user.status,
+                    createdAt: response.data.user.createdAt,
+                }
+            )
+
+            notifySuccess(response.message || "Login successful")
+
+            // Navigate to intended destination or dashboard
+            const from = (location.state as { from?: Location })?.from?.pathname || "/"
+            navigate(from, { replace: true })
+        },
+        onError: (error: unknown) => {
+            console.error("Login failed:", error)
+            let errorMessage = "An unexpected error occurred"
+
+            if (error instanceof AxiosError) {
+                // Try to get error message from API response
+                const apiError = error.response?.data as { message?: string } | undefined
+                errorMessage = apiError?.message || error.message || "Login failed. Please check your credentials."
+            } else if (error instanceof Error) {
+                errorMessage = error.message
+            }
+
+            notifyError(errorMessage, "Login failed")
+        },
+    })
+
+    const form = useForm({
+        defaultValues: {
+            email: "",
+            password: "",
+        },
+        validators: {
+            onSubmit: loginSchema,
+        },
+        onSubmit: async ({ value }) => {
+            loginMutation.mutate({
+                email: value.email,
+                password: value.password,
+            })
+        },
+    });
+
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (isAuthenticated) {
+            const from = (location.state as { from?: Location })?.from?.pathname || "/"
+            navigate(from, { replace: true })
+        }
+    }, [isAuthenticated, navigate, location.state])
+
+    if (isAuthenticated) {
+        return null
+    }
+
+    return (
+        <LoginComponent form={form} isPending={loginMutation.isPending} />
+    );
+}
