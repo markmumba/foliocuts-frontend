@@ -1,9 +1,9 @@
-import { useEffect, useRef } from 'react';
-import { useRouter } from 'expo-router';
-import { View, Text, StyleSheet, Animated } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { brandColors, fontSize, fontWeight } from '@digital-barbershop/shared-theme';
-import { Scissors } from 'lucide-react-native';
+import { useEffect, useRef } from "react";
+import { useRouter } from "expo-router";
+import { View, Animated } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { Scissors } from "lucide-react-native";
+import { Text, Heading } from "../components/ui";
 
 export default function SplashScreen() {
   const router = useRouter();
@@ -28,88 +28,43 @@ export default function SplashScreen() {
 
     // Navigate after splash
     const timer = setTimeout(() => {
-      // TODO: Check auth status and navigate accordingly
-      // If authenticated, go to (tabs), else go to login
-      router.replace('/login');
+      router.replace("/login");
     }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 bg-primary items-center justify-center">
       <StatusBar style="light" />
-      
-      <Animated.View 
-        style={[
-          styles.content,
-          {
-            opacity: fadeAnim,
-            transform: [{ scale: scaleAnim }],
-          },
-        ]}
+
+      <Animated.View
+        className="items-center"
+        style={{
+          opacity: fadeAnim,
+          transform: [{ scale: scaleAnim }],
+        }}
       >
         {/* Icon */}
-        <View style={styles.iconContainer}>
-          <Scissors size={48} color={brandColors.secondary} strokeWidth={1.5} />
+        <View className="w-22 h-22 bg-secondary/10 border border-secondary/30 rounded-3xl items-center justify-center mb-5">
+          <Scissors size={48} color="#f5b700" strokeWidth={1.5} />
         </View>
-        
+
         {/* Brand Name */}
-        <Text style={styles.brandName}>FolioCuts</Text>
-        
+        <Text className="text-4xl font-bold text-white tracking-wide">
+          FolioCuts
+        </Text>
+
         {/* Tagline */}
-        <Text style={styles.tagline}>Employee Portal</Text>
+        <Text className="text-base text-secondary font-medium mt-2 uppercase tracking-widest">
+          Employee Portal
+        </Text>
       </Animated.View>
 
-      {/* Subtle footer */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>Digital Barbershop Platform</Text>
+      {/* Footer */}
+      <View className="absolute bottom-12">
+        <Text className="text-sm text-white/30">Digital Barbershop Platform</Text>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: brandColors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  content: {
-    alignItems: 'center',
-  },
-  iconContainer: {
-    width: 88,
-    height: 88,
-    backgroundColor: 'rgba(245, 183, 0, 0.1)',
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(245, 183, 0, 0.3)',
-  },
-  brandName: {
-    fontSize: 36,
-    fontWeight: fontWeight.bold,
-    color: '#ffffff',
-    letterSpacing: 0.5,
-  },
-  tagline: {
-    fontSize: fontSize.base,
-    color: brandColors.secondary,
-    marginTop: 8,
-    fontWeight: fontWeight.medium,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-  },
-  footer: {
-    position: 'absolute',
-    bottom: 50,
-  },
-  footerText: {
-    fontSize: fontSize.sm,
-    color: 'rgba(255, 255, 255, 0.3)',
-  },
-});

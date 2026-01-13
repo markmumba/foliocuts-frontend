@@ -1,20 +1,19 @@
-import { Tabs } from 'expo-router';
-import { Home, Calendar, User, BarChart3 } from 'lucide-react-native';
-import { brandColors } from '@digital-barbershop/shared-theme';
-import { useTheme } from '../../context/ThemeContext';
+import { Tabs } from "expo-router";
+import { Home, Calendar, User, BarChart3 } from "lucide-react-native";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function TabsLayout() {
   const { theme, isDark } = useTheme();
-  
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: brandColors.accent,
-        tabBarInactiveTintColor: theme.mutedForeground,
+        tabBarActiveTintColor: "#2eb67d",
+        tabBarInactiveTintColor: isDark ? "#a1a1aa" : "#6b7280",
         tabBarStyle: {
-          backgroundColor: theme.background,
-          borderTopColor: theme.border,
+          backgroundColor: isDark ? "#1e1e22" : "#ffffff",
+          borderTopColor: isDark ? "#404048" : "#e5e7eb",
           borderTopWidth: 1,
           paddingBottom: 8,
           paddingTop: 8,
@@ -22,44 +21,36 @@ export default function TabsLayout() {
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: '500',
+          fontWeight: "500",
         },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color, size }) => (
-            <Home size={size} color={color} />
-          ),
+          title: "Home",
+          tabBarIcon: ({ color, size }) => <Home size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="appointments"
         options={{
-          title: 'Bookings',
-          tabBarIcon: ({ color, size }) => (
-            <Calendar size={size} color={color} />
-          ),
+          title: "Bookings",
+          tabBarIcon: ({ color, size }) => <Calendar size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="stats"
         options={{
-          title: 'Stats',
-          tabBarIcon: ({ color, size }) => (
-            <BarChart3 size={size} color={color} />
-          ),
+          title: "Stats",
+          tabBarIcon: ({ color, size }) => <BarChart3 size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
-          tabBarIcon: ({ color, size }) => (
-            <User size={size} color={color} />
-          ),
+          title: "Profile",
+          tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
         }}
       />
     </Tabs>

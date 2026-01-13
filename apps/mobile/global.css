@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Light Theme (Default) */
+:root {
+  --background: #ffffff;
+  --foreground: #1c1e26;
+  --card: #ffffff;
+  --card-foreground: #1c1e26;
+  --muted: #f5f5f5;
+  --muted-foreground: #6b7280;
+  --border: #e5e7eb;
+  --input: #f5f5f5;
+  --ring: #2eb67d;
+}
+
+/* Dark Theme */
+.dark {
+  --background: #1e1e22;
+  --foreground: #f4f4f5;
+  --card: #262629;
+  --card-foreground: #f4f4f5;
+  --muted: #2e2e33;
+  --muted-foreground: #a1a1aa;
+  --border: #404048;
+  --input: #2e2e33;
+  --ring: #2eb67d;
+}
+

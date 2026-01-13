@@ -1,19 +1,9 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { 
-  brandColors, 
-  spacing, 
-  fontSize, 
-  fontWeight, 
-  borderRadius 
-} from '@digital-barbershop/shared-theme';
-import { TrendingUp, TrendingDown, Users, Scissors, DollarSign, Star } from 'lucide-react-native';
-import { useTheme } from '../../context/ThemeContext';
+import { View, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { TrendingUp, TrendingDown, Users, Scissors, DollarSign, Star } from "lucide-react-native";
+import { Card, Text, Heading, Badge } from "../../components/ui";
 
 export default function StatsTab() {
-  const { theme, isDark } = useTheme();
-  
-  // Mock data - will be replaced with actual API data
   const weeklyStats = {
     earnings: 32500,
     earningsChange: 12,
@@ -26,42 +16,38 @@ export default function StatsTab() {
   };
 
   const topServices = [
-    { name: 'Fade Cut', count: 18, revenue: 9000 },
-    { name: 'Haircut + Beard', count: 15, revenue: 12000 },
-    { name: 'Full Grooming', count: 8, revenue: 8000 },
-    { name: 'Beard Trim', count: 6, revenue: 1800 },
+    { name: "Fade Cut", count: 18, revenue: 9000 },
+    { name: "Haircut + Beard", count: 15, revenue: 12000 },
+    { name: "Full Grooming", count: 8, revenue: 8000 },
+    { name: "Beard Trim", count: 6, revenue: 1800 },
   ];
 
-  const styles = createStyles(theme, isDark);
-
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Performance</Text>
-        <Text style={styles.headerSubtitle}>This Week</Text>
+    <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
+      {/* Header */}
+      <View className="px-6 pt-4 pb-6">
+        <Heading level={2}>Performance</Heading>
+        <Text variant="caption" className="mt-1">This Week</Text>
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Main Stats Grid */}
-        <View style={styles.statsGrid}>
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        {/* Stats Grid */}
+        <View className="flex-row flex-wrap gap-2 px-6 mb-6">
           <StatCard
-            theme={theme}
-            icon={<DollarSign size={22} color={brandColors.secondary} />}
+            icon={<DollarSign size={22} color="#f5b700" />}
             label="Total Earnings"
             value={`KES ${weeklyStats.earnings.toLocaleString()}`}
             change={weeklyStats.earningsChange}
-            color={brandColors.secondary}
+            color="#f5b700"
           />
           <StatCard
-            theme={theme}
-            icon={<Users size={22} color={brandColors.accent} />}
+            icon={<Users size={22} color="#2eb67d" />}
             label="Clients Served"
             value={weeklyStats.clients.toString()}
             change={weeklyStats.clientsChange}
-            color={brandColors.accent}
+            color="#2eb67d"
           />
           <StatCard
-            theme={theme}
             icon={<Scissors size={22} color="#8b5cf6" />}
             label="Services Done"
             value={weeklyStats.services.toString()}
@@ -69,7 +55,6 @@ export default function StatsTab() {
             color="#8b5cf6"
           />
           <StatCard
-            theme={theme}
             icon={<Star size={22} color="#f59e0b" />}
             label="Avg Rating"
             value={weeklyStats.rating.toString()}
@@ -79,64 +64,62 @@ export default function StatsTab() {
         </View>
 
         {/* Top Services */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Top Services</Text>
+        <View className="px-6 mb-6">
+          <Heading level={4} className="mb-4">Top Services</Heading>
           {topServices.map((service, index) => (
-            <View key={service.name} style={styles.serviceRow}>
-              <View style={styles.serviceRank}>
-                <Text style={styles.rankText}>{index + 1}</Text>
+            <Card key={service.name} className="flex-row items-center mb-2">
+              <View className="w-7 h-7 rounded-full bg-accent/15 items-center justify-center">
+                <Text className="text-sm font-bold text-accent">{index + 1}</Text>
               </View>
-              <View style={styles.serviceInfo}>
-                <Text style={styles.serviceName}>{service.name}</Text>
-                <Text style={styles.serviceCount}>{service.count} services</Text>
+              <View className="flex-1 ml-3">
+                <Text className="font-medium">{service.name}</Text>
+                <Text variant="caption">{service.count} services</Text>
               </View>
-              <Text style={styles.serviceRevenue}>
+              <Text className="font-semibold text-secondary">
                 KES {service.revenue.toLocaleString()}
               </Text>
-            </View>
+            </Card>
           ))}
         </View>
 
-        {/* Performance Insights */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Insights</Text>
-          <View style={styles.insightCard}>
-            <View style={[styles.insightIcon, { backgroundColor: `${brandColors.accent}15` }]}>
-              <TrendingUp size={20} color={brandColors.accent} />
+        {/* Insights */}
+        <View className="px-6 pb-8">
+          <Heading level={4} className="mb-4">Insights</Heading>
+          <Card className="flex-row mb-2">
+            <View className="w-10 h-10 rounded-lg bg-accent/15 items-center justify-center">
+              <TrendingUp size={20} color="#2eb67d" />
             </View>
-            <View style={styles.insightContent}>
-              <Text style={styles.insightTitle}>Great Week!</Text>
-              <Text style={styles.insightText}>
+            <View className="flex-1 ml-3">
+              <Text className="font-semibold">Great Week!</Text>
+              <Text variant="caption" className="mt-1">
                 Your earnings are up 12% compared to last week. Keep up the excellent work!
               </Text>
             </View>
-          </View>
-          <View style={styles.insightCard}>
-            <View style={[styles.insightIcon, { backgroundColor: `${brandColors.secondary}15` }]}>
-              <Star size={20} color={brandColors.secondary} />
+          </Card>
+          <Card className="flex-row">
+            <View className="w-10 h-10 rounded-lg bg-secondary/15 items-center justify-center">
+              <Star size={20} color="#f5b700" />
             </View>
-            <View style={styles.insightContent}>
-              <Text style={styles.insightTitle}>Top Performer</Text>
-              <Text style={styles.insightText}>
+            <View className="flex-1 ml-3">
+              <Text className="font-semibold">Top Performer</Text>
+              <Text variant="caption" className="mt-1">
                 You're in the top 10% of stylists this week based on client satisfaction.
               </Text>
             </View>
-          </View>
+          </Card>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function StatCard({ 
-  theme,
-  icon, 
-  label, 
-  value, 
-  change, 
-  color 
-}: { 
-  theme: typeof import('@digital-barbershop/shared-theme').lightTheme;
+function StatCard({
+  icon,
+  label,
+  value,
+  change,
+  color,
+}: {
   icon: React.ReactNode;
   label: string;
   value: string;
@@ -144,155 +127,32 @@ function StatCard({
   color: string;
 }) {
   const isPositive = change >= 0;
-  
+
   return (
-    <View style={{
-      flex: 1,
-      minWidth: '45%',
-      backgroundColor: theme.card,
-      borderRadius: borderRadius.lg,
-      padding: spacing.md,
-      borderWidth: 1,
-      borderColor: theme.border,
-    }}>
-      <View style={{
-        width: 40,
-        height: 40,
-        borderRadius: borderRadius.md,
-        backgroundColor: `${color}15`,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: spacing.sm,
-      }}>
+    <Card className="flex-1 min-w-[45%]">
+      <View
+        className="w-10 h-10 rounded-lg items-center justify-center mb-2"
+        style={{ backgroundColor: `${color}15` }}
+      >
         {icon}
       </View>
-      <Text style={{ fontSize: fontSize.xl, fontWeight: fontWeight.bold, color: theme.foreground }}>{value}</Text>
-      <Text style={{ fontSize: fontSize.sm, color: theme.mutedForeground, marginTop: 2 }}>{label}</Text>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: spacing.sm }}>
+      <Text className="text-xl font-bold">{value}</Text>
+      <Text variant="caption">{label}</Text>
+      <View className="flex-row items-center gap-1 mt-2">
         {isPositive ? (
-          <TrendingUp size={12} color={brandColors.accent} />
+          <TrendingUp size={12} color="#2eb67d" />
         ) : (
           <TrendingDown size={12} color="#ef4444" />
         )}
-        <Text style={{ fontSize: fontSize.xs, fontWeight: fontWeight.medium, color: isPositive ? brandColors.accent : '#ef4444' }}>
-          {isPositive ? '+' : ''}{change}%
+        <Text
+          className={`text-xs font-medium ${
+            isPositive ? "text-accent" : "text-destructive"
+          }`}
+        >
+          {isPositive ? "+" : ""}
+          {change}%
         </Text>
       </View>
-    </View>
+    </Card>
   );
 }
-
-const createStyles = (theme: typeof import('@digital-barbershop/shared-theme').lightTheme, isDark: boolean) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.background,
-  },
-  header: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.lg,
-  },
-  headerTitle: {
-    fontSize: fontSize['2xl'],
-    fontWeight: fontWeight.bold,
-    color: theme.foreground,
-  },
-  headerSubtitle: {
-    fontSize: fontSize.base,
-    color: theme.mutedForeground,
-    marginTop: 4,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: spacing.lg,
-    gap: spacing.sm,
-    marginBottom: spacing.lg,
-  },
-  section: {
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: fontSize.lg,
-    fontWeight: fontWeight.semibold,
-    color: theme.foreground,
-    marginBottom: spacing.md,
-  },
-  serviceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: theme.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    borderWidth: 1,
-    borderColor: theme.border,
-  },
-  serviceRank: {
-    width: 28,
-    height: 28,
-    borderRadius: 999,
-    backgroundColor: `${brandColors.accent}15`,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  rankText: {
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.bold,
-    color: brandColors.accent,
-  },
-  serviceInfo: {
-    flex: 1,
-    marginLeft: spacing.md,
-  },
-  serviceName: {
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.medium,
-    color: theme.foreground,
-  },
-  serviceCount: {
-    fontSize: fontSize.sm,
-    color: theme.mutedForeground,
-    marginTop: 2,
-  },
-  serviceRevenue: {
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.semibold,
-    color: brandColors.secondary,
-  },
-  insightCard: {
-    flexDirection: 'row',
-    backgroundColor: theme.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    borderWidth: 1,
-    borderColor: theme.border,
-  },
-  insightIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: borderRadius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  insightContent: {
-    flex: 1,
-    marginLeft: spacing.md,
-  },
-  insightTitle: {
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.semibold,
-    color: theme.foreground,
-  },
-  insightText: {
-    fontSize: fontSize.sm,
-    color: theme.mutedForeground,
-    marginTop: 4,
-    lineHeight: 20,
-  },
-});
