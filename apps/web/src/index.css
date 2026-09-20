@@ -13,12 +13,21 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  /* Modern Afro-Urban Color Palette */
+  /* FolioCuts Brand Palette */
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
   --color-accent: var(--accent);
   --color-neutral: var(--neutral);
   --color-error: var(--error);
+
+  /* Brand Tokens */
+  --color-ink: var(--ink);
+  --color-forest: var(--forest);
+  --color-lime: var(--lime);
+  --color-yellow: var(--yellow);
+  --color-peach: var(--peach);
+  --color-paper: var(--paper);
+  --color-line: var(--line);
 
   /* Light Variations */
   --color-primary-light: var(--primary-light);
@@ -62,104 +71,118 @@
 }
 
 :root {
-  /* Modern Afro-Urban Color Scheme - Matching Landing Page */
+  /* FolioCuts Brand — synced with landing page */
   --radius: 0.625rem;
 
+  /* Brand Colors */
+  --ink: #08251a;
+  --forest: #063b26;
+  --lime: #cfff92;
+  --yellow: #ffeb69;
+  --peach: #ffc091;
+  --paper: #f5f6f4;
+  --muted-brand: #5b6961;
+  --line: #e1e6df;
+
   /* Core Colors */
-  --primary: #1c1e26; /* Deep Navy - professional, tech-forward */
-  --secondary: #f5b700; /* Warm Gold - premium service, crown-like */
-  --accent: #2eb67d; /* Emerald Green - fresh, growth, M-Pesa familiar */
-  --background: #ffffff; /* White background */
-  --neutral: #f5f5f5; /* Soft Grey for sections */
-  --error: #e63946; /* Vibrant Red for alerts */
+  --primary: #063b26; /* Forest — primary brand */
+  --secondary: #cfff92; /* Lime — accent, CTAs */
+  --accent: #cfff92; /* Lime — highlights, active states */
+  --background: #ffffff;
+  --neutral: #f5f6f4; /* Paper — muted surfaces */
+  --error: #e63946;
 
   /* Text Colors */
-  --foreground: #1c1e26; /* Primary color for main text */
-  --foreground-muted: #6b7280; /* Muted text color */
+  --foreground: #08251a; /* Ink — primary text */
+  --foreground-muted: #5b6961; /* Muted — secondary text */
 
   /* Light Variations */
-  --primary-light: #2a2d38; /* Lighter shade of primary */
-  --secondary-light: #f7c52d; /* Lighter shade of secondary */
-  --accent-light: #4ecdc4; /* Lighter shade of accent */
+  --primary-light: #0a4d33;
+  --secondary-light: #d9ffa6;
+  --accent-light: #e0ffbb;
 
   /* Component Colors */
   --card: #ffffff;
-  --card-foreground: #1c1e26;
+  --card-foreground: #08251a;
   --popover: #ffffff;
-  --popover-foreground: #1c1e26;
+  --popover-foreground: #08251a;
   --primary-foreground: #ffffff;
-  --secondary-foreground: #1c1e26;
-  --muted: #f5f5f5;
-  --muted-foreground: #6b7280;
-  --accent-foreground: #ffffff;
+  --secondary-foreground: #08251a;
+  --muted: #f5f6f4;
+  --muted-foreground: #5b6961;
+  --accent-foreground: #08251a;
   --destructive: #e63946;
-  --border: #e5e7eb;
-  --input: #f5f5f5;
-  --ring: #2eb67d;
+  --border: #e1e6df;
+  --input: #f5f6f4;
+  --ring: #063b26;
 
   /* Chart Colors */
-  --chart-1: #2eb67d; /* Accent green */
-  --chart-2: #f5b700; /* Secondary gold */
-  --chart-3: #1c1e26; /* Primary navy */
-  --chart-4: #4ecdc4; /* Accent light */
-  --chart-5: #f7c52d; /* Secondary light */
+  --chart-1: #063b26; /* Forest */
+  --chart-2: #cfff92; /* Lime */
+  --chart-3: #ffeb69; /* Yellow */
+  --chart-4: #ffc091; /* Peach */
+  --chart-5: #5b6961; /* Muted */
 
   /* Sidebar Colors */
   --sidebar: #ffffff;
-  --sidebar-foreground: #1c1e26;
-  --sidebar-primary: #1c1e26;
+  --sidebar-foreground: #08251a;
+  --sidebar-primary: #063b26;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f5f5f5;
-  --sidebar-accent-foreground: #1c1e26;
-  --sidebar-border: #e5e7eb;
-  --sidebar-ring: #2eb67d;
+  --sidebar-accent: #f5f6f4;
+  --sidebar-accent-foreground: #08251a;
+  --sidebar-border: #e1e6df;
+  --sidebar-ring: #063b26;
+
+  /* Animation Easing */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 .dark {
-  /* Lighter dark theme */
-  --background: #1e1e22; /* Softer dark */
-  --foreground: #f4f4f5;
-  
-  --card: #262629; /* Lighter cards */
-  --card-foreground: #f4f4f5;
-  
-  --popover: #262629;
-  --popover-foreground: #f4f4f5;
-  
-  --primary: #f4f4f5;
-  --primary-foreground: #1e1e22;
-  
-  --secondary: #2e2e33;
-  --secondary-foreground: #f4f4f5;
-  
-  --muted: #2e2e33;
-  --muted-foreground: #a1a1aa;
-  
-  --accent: #2eb67d;
-  --accent-foreground: #f4f4f5;
-  
+  /* Dark theme — forest-tinted */
+  --background: #0a1f15;
+  --foreground: #f5f6f4;
+
+  --card: #0f2b1d;
+  --card-foreground: #f5f6f4;
+
+  --popover: #0f2b1d;
+  --popover-foreground: #f5f6f4;
+
+  --primary: #cfff92; /* Lime — inverted emphasis */
+  --primary-foreground: #063b26;
+
+  --secondary: #132e20;
+  --secondary-foreground: #f5f6f4;
+
+  --muted: #132e20;
+  --muted-foreground: #8fa698;
+
+  --accent: #cfff92;
+  --accent-foreground: #063b26;
+
   --destructive: #ef4444;
-  
-  --border: #404048;
-  --input: #2e2e33;
-  --ring: #2eb67d;
-  
+
+  --border: #1a3d2a;
+  --input: #132e20;
+  --ring: #cfff92;
+
   /* Chart Colors */
-  --chart-1: #2eb67d;
-  --chart-2: #f5b700;
-  --chart-3: #3b82f6;
-  --chart-4: #8b5cf6;
-  --chart-5: #ec4899;
-  
+  --chart-1: #cfff92;
+  --chart-2: #ffeb69;
+  --chart-3: #ffc091;
+  --chart-4: #8fa698;
+  --chart-5: #f5f6f4;
+
   /* Sidebar */
-  --sidebar: #1e1e22;
-  --sidebar-foreground: #f4f4f5;
-  --sidebar-primary: #2eb67d;
-  --sidebar-primary-foreground: #f4f4f5;
-  --sidebar-accent: #2e2e33;
-  --sidebar-accent-foreground: #f4f4f5;
-  --sidebar-border: #404048;
-  --sidebar-ring: #2eb67d;
+  --sidebar: #0a1f15;
+  --sidebar-foreground: #f5f6f4;
+  --sidebar-primary: #cfff92;
+  --sidebar-primary-foreground: #063b26;
+  --sidebar-accent: #132e20;
+  --sidebar-accent-foreground: #f5f6f4;
+  --sidebar-border: #1a3d2a;
+  --sidebar-ring: #cfff92;
 }
 
 @layer base {
