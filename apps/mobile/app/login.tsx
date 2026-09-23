@@ -46,7 +46,6 @@ export default function LoginScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Logo */}
         <View className="items-center mb-8">
           <View className="w-16 h-16 bg-secondary/10 border-2 border-secondary rounded-xl items-center justify-center mb-4">
             <Scissors size={32} color="#f5b700" strokeWidth={2} />
@@ -57,7 +56,6 @@ export default function LoginScreen() {
           </Text>
         </View>
 
-        {/* Welcome Text */}
         <View className="mb-8">
           <Heading level={1} className="mb-2">
             Welcome Back
@@ -67,7 +65,6 @@ export default function LoginScreen() {
           </Text>
         </View>
 
-        {/* Form */}
         <View className="flex-1">
           <Input
             label="Email Address"
@@ -111,7 +108,6 @@ export default function LoginScreen() {
           </Button>
         </View>
 
-        {/* Footer */}
         <View className="items-center pt-8">
           <Text variant="caption" className="text-center">
             Having trouble? Contact your shop administrator
